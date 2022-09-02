@@ -30,6 +30,9 @@ set(PATH ./src)
 
 set(SOURCE_FILES
         ${PATH}/happly.h
+        ${PATH}/params.h
+        ${PATH}/params.cpp
+        ${PATH}/types.h
         )
 
 add_executable(main ${PATH}/main.cpp ${SOURCE_FILES})
