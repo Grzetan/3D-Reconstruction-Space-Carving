@@ -1,11 +1,15 @@
 # Prerequisites
 *.d
-
+Makefile
+CMakeCache.txt
+cmake_install.cmake
+CMakeFiles
 # Compiled Object files
 *.slo
 *.lo
 *.o
 *.obj
+main
 
 # Precompiled Headers
 *.gch
