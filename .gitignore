@@ -10,6 +10,7 @@ CMakeFiles
 *.o
 *.obj
 main
+*.ply
 
 # Precompiled Headers
 *.gch
