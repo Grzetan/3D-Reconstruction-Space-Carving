@@ -11,6 +11,7 @@ CMakeFiles
 *.obj
 main
 *.ply
+.vscode
 
 # Precompiled Headers
 *.gch

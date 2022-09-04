@@ -17,6 +17,9 @@ enum CubeFaces{
 typedef std::map<CubeFaces, bool> FaceVisMap;
 typedef std::map<CubeFaces, bool>::iterator FaceVisMapIterator;
 
+typedef std::tuple<double, double, double> Key;
+typedef std::map<Key, int> UniqueVertices;
+
 const std::tuple<int, int, int> LEFT_FACE = {-1, 0, 0};
 const std::tuple<int, int, int> RIGHT_FACE = {1, 0, 0};
 const std::tuple<int, int, int> TOP_FACE = {0, 1, 0};
