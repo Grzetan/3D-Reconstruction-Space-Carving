@@ -172,8 +172,53 @@ bool rayAABBIntersection(const Ray& ray,
     if (tzmax < tmax) 
         tmax = tzmax; 
  
+    if(tmin < 0 || tmax < 0) return false;
+
     tstart = tmin;
     tend = tmax;
 
     return true; 
+}
+
+// https://www.youtube.com/watch?v=lJdEX3w0xaY
+void rayGridTraversal(Ray& ray, Voxels& voxels, const AABB& box){
+    double tstart, tend;
+
+    // If ray doesn't hit AABB of voxels, skip
+    if(!rayAABBIntersection(ray, box, tstart, tend)){
+        return;
+    }
+
+    // Calculate enter point and voxel
+    Vec3 enterPoint = ray.orig + ray.dir * tstart;
+
+    int enterVoxel[3];
+
+    enterVoxel[0] = std::floor(enterPoint.x / VOXEL_SIZE);
+    enterVoxel[1] = std::floor(enterPoint.y / VOXEL_SIZE);
+    enterVoxel[2] = std::floor(enterPoint.z / VOXEL_SIZE);
+
+    std::cout << enterPoint.x << ", " << enterPoint.y << ", " << enterPoint.z << std::endl;
+    std::cout << enterVoxel[0] << ", " << enterVoxel[1] << ", " << enterVoxel[2] << std::endl;
+
+    // Get binary direction of ray
+    int xDir = ray.dir.x > 0 ? 1 : ray.dir.x < 0 ? -1 : 0;
+    int yDir = ray.dir.y > 0 ? 1 : ray.dir.y < 0 ? -1 : 0;
+    int zDir = ray.dir.z > 0 ? 1 : ray.dir.z < 0 ? -1 : 0;
+
+    // Get world position of grid boundaries ray is going to hit
+    double xBound = (xDir > 0 ? enterVoxel[0]+1 : enterVoxel[0]) * VOXEL_SIZE;
+    double yBound = (yDir > 0 ? enterVoxel[1]+1 : enterVoxel[1]) * VOXEL_SIZE;
+    double zBound = (zDir > 0 ? enterVoxel[2]+1 : enterVoxel[2]) * VOXEL_SIZE;
+
+    // Get the exact time of intersection with each boundary
+    double xt = (xBound - enterPoint.x) / ray.dir.x;
+    double yt = (yBound - enterPoint.y) / ray.dir.y;
+    double zt = (zBound - enterPoint.z) / ray.dir.z;
+
+    // Time needed to travel through voxel for each axis
+    double xDelta = VOXEL_SIZE * xDir / ray.dir.x;
+    double yDelta = VOXEL_SIZE * yDir / ray.dir.y;
+    double zDelta = VOXEL_SIZE * zDir / ray.dir.z;
+
 }

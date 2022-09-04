@@ -5,6 +5,7 @@
 #include <vector>
 #include "types.h"
 #include "happly.h"
+#include <cmath>
 
 void generateVoxels(Voxels& voxels);
 
@@ -18,3 +19,5 @@ bool rayAABBIntersection(const Ray& ray,
                          const AABB& box,
                          double& tstart,
                          double& tend);
+
+void rayGridTraversal(Ray& ray, Voxels& voxels, const AABB& box);

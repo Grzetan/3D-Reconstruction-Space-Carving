@@ -4,7 +4,7 @@
 #include <array>
 #include <map>
 
-#define SCENE_SIZE 100
+#define SCENE_SIZE 10
 #define VOXEL_SIZE 0.2
 
 class Vec3{
@@ -21,6 +21,14 @@ public:
         x = x_;
         y = y_;
         z = z_;
+    }
+
+    Vec3 operator*(double t){
+        return {x*t, y*t, z*t};
+    }
+
+    Vec3 operator+(Vec3 v){
+        return {x+v.x, y+v.y, z+v.z};
     }
 };
 

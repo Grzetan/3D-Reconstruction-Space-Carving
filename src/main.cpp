@@ -15,12 +15,9 @@ int main(int argc, char *argv[]){
 
     // generateVoxels(voxels);
 
-    Ray ray({0.5,0,0}, {-1,0,0.5});
+    Ray ray({1,0,0}, {-10,1.8,0.3});
     AABB box({0,0,0}, {VOXEL_SIZE*SCENE_SIZE, VOXEL_SIZE*SCENE_SIZE, VOXEL_SIZE*SCENE_SIZE});
 
-    double start, end;
-    bool i = rayAABBIntersection(ray, box, start, end);
-
-    std::cout << i << ", start: " << start << ", end: " << end << std::endl;
+    rayGridTraversal(ray, voxels, box);
     return 0;
 }
