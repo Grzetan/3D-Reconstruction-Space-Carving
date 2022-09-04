@@ -33,6 +33,8 @@ set(SOURCE_FILES
         ${PATH}/params.h
         ${PATH}/params.cpp
         ${PATH}/types.h
+        ${PATH}/utils.h
+        ${PATH}/utils.cpp
         )
 
 add_executable(main ${PATH}/main.cpp ${SOURCE_FILES})
