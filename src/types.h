@@ -1,10 +1,11 @@
 #pragma once
 
+#include <iostream>
 #include <vector>
 #include <array>
 #include <map>
 
-#define SCENE_SIZE 10
+#define SCENE_SIZE 100
 #define VOXEL_SIZE 0.2
 
 class Vec3{

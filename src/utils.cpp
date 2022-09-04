@@ -181,6 +181,7 @@ bool rayAABBIntersection(const Ray& ray,
 }
 
 // https://www.youtube.com/watch?v=lJdEX3w0xaY
+// https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.42.3443&rep=rep1&type=pdf
 void rayGridTraversal(Ray& ray, Voxels& voxels, const AABB& box){
     double tstart, tend;
 
@@ -198,9 +199,6 @@ void rayGridTraversal(Ray& ray, Voxels& voxels, const AABB& box){
     enterVoxel[1] = std::floor(enterPoint.y / VOXEL_SIZE);
     enterVoxel[2] = std::floor(enterPoint.z / VOXEL_SIZE);
 
-    std::cout << enterPoint.x << ", " << enterPoint.y << ", " << enterPoint.z << std::endl;
-    std::cout << enterVoxel[0] << ", " << enterVoxel[1] << ", " << enterVoxel[2] << std::endl;
-
     // Get binary direction of ray
     int xDir = ray.dir.x > 0 ? 1 : ray.dir.x < 0 ? -1 : 0;
     int yDir = ray.dir.y > 0 ? 1 : ray.dir.y < 0 ? -1 : 0;
@@ -212,13 +210,40 @@ void rayGridTraversal(Ray& ray, Voxels& voxels, const AABB& box){
     double zBound = (zDir > 0 ? enterVoxel[2]+1 : enterVoxel[2]) * VOXEL_SIZE;
 
     // Get the exact time of intersection with each boundary
-    double xt = (xBound - enterPoint.x) / ray.dir.x;
-    double yt = (yBound - enterPoint.y) / ray.dir.y;
-    double zt = (zBound - enterPoint.z) / ray.dir.z;
+    double xt = (xBound - enterPoint.x) / (ray.dir.x + 1e-6);
+    double yt = (yBound - enterPoint.y) / (ray.dir.y + 1e-6);
+    double zt = (zBound - enterPoint.z) / (ray.dir.z + 1e-6);
 
     // Time needed to travel through voxel for each axis
-    double xDelta = VOXEL_SIZE * xDir / ray.dir.x;
-    double yDelta = VOXEL_SIZE * yDir / ray.dir.y;
-    double zDelta = VOXEL_SIZE * zDir / ray.dir.z;
+    double xDelta = VOXEL_SIZE * xDir / (ray.dir.x + 1e-6);
+    double yDelta = VOXEL_SIZE * yDir / (ray.dir.y + 1e-6);
+    double zDelta = VOXEL_SIZE * zDir / (ray.dir.z + 1e-6);
 
+    // What is the termination index for each axis
+    int xOut = xDir < 0 ? -1 : SCENE_SIZE;
+    int yOut = yDir < 0 ? -1 : SCENE_SIZE;
+    int zOut = zDir < 0 ? -1 : SCENE_SIZE;
+
+    xt = (xt <= 0) ? 100000 : xt;
+    yt = (yt <= 0) ? 100000 : yt;
+    zt = (zt <= 0) ? 100000 : zt;
+
+    // Traverse until exit
+    while(true){
+        voxels[idx(enterVoxel[0], enterVoxel[1], enterVoxel[2])] = true;
+
+        if(xt < yt && xt < zt){
+            enterVoxel[0] += xDir;
+            if(enterVoxel[0] == xOut) break;
+            xt += xDelta;
+        }else if(yt < zt){
+            enterVoxel[1] += yDir;
+            if(enterVoxel[1] == yOut) break;
+            yt += yDelta;
+        }else{
+            enterVoxel[2] += zDir;
+            if(enterVoxel[2] == zOut) break;
+            zt += zDelta;
+        }
+    }
 }
