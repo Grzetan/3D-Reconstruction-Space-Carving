@@ -31,6 +31,10 @@ public:
     Vec3 operator+(Vec3 v){
         return {x+v.x, y+v.y, z+v.z};
     }
+
+    Vec3 operator+(double a){
+        return {x+a, y+a, z+a};
+    }
 };
 
 typedef std::vector<bool> Voxels; // false = visible, true = notvisible (to avoid filling vector with default values)

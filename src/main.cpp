@@ -19,7 +19,7 @@ int main(int argc, char *argv[]){
     BMP img("./images/whiteBox.bmp");
 
     // Camera position and rotation in real world relative to center of turn table
-    Vec3 cameraPos(VOXEL_SIZE * SCENE_SIZE / 2 - 0.01, 0, VOXEL_SIZE * SCENE_SIZE / 2 - 0.01);
+    Vec3 cameraPos(VOXEL_SIZE * SCENE_SIZE / 2, 0, VOXEL_SIZE * SCENE_SIZE / 2);
     Vec3 cameraDir(0, 1, 0);
 
     // Camera parameters

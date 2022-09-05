@@ -193,16 +193,16 @@ void rayGridTraversal(Ray& ray, Voxels& voxels, const AABB& box){
     // Calculate enter point and voxel
     Vec3 enterPoint = ray.orig + ray.dir * tstart;
 
-    int enterVoxel[3];
-
-    enterVoxel[0] = std::floor(enterPoint.x / VOXEL_SIZE);
-    enterVoxel[1] = std::floor(enterPoint.y / VOXEL_SIZE);
-    enterVoxel[2] = std::floor(enterPoint.z / VOXEL_SIZE);
-
     // Get binary direction of ray
     int xDir = ray.dir.x > 0 ? 1 : ray.dir.x < 0 ? -1 : 0;
     int yDir = ray.dir.y > 0 ? 1 : ray.dir.y < 0 ? -1 : 0;
     int zDir = ray.dir.z > 0 ? 1 : ray.dir.z < 0 ? -1 : 0;
+
+    int enterVoxel[3];
+
+    enterVoxel[0] = std::floor(enterPoint.x / (VOXEL_SIZE + -xDir * 1e-6));
+    enterVoxel[1] = std::floor(enterPoint.y / (VOXEL_SIZE + -yDir * 1e-6));
+    enterVoxel[2] = std::floor(enterPoint.z / (VOXEL_SIZE + -zDir * 1e-6));
 
     // Get world position of grid boundaries ray is going to hit
     double xBound = (xDir > 0 ? enterVoxel[0]+1 : enterVoxel[0]) * VOXEL_SIZE;
@@ -214,7 +214,7 @@ void rayGridTraversal(Ray& ray, Voxels& voxels, const AABB& box){
     double yt = std::abs((yBound - enterPoint.y) / (ray.dir.y + 1e-6));
     double zt = std::abs((zBound - enterPoint.z) / (ray.dir.z + 1e-6));
 
-
+    std::cout << xt << ", " << yt << ", " << zt << std::endl;
     // Time needed to travel through voxel for each axis
     double xDelta = VOXEL_SIZE * xDir / (ray.dir.x + 1e-6);
     double yDelta = VOXEL_SIZE * yDir / (ray.dir.y + 1e-6);
