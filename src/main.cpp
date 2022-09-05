@@ -19,34 +19,45 @@ int main(int argc, char *argv[]){
     BMP img("./images/whiteBox.bmp");
 
     // Camera position and rotation in real world relative to center of turn table
-    Vec3 cameraPos(VOXEL_SIZE * SCENE_SIZE / 2, 0, VOXEL_SIZE * SCENE_SIZE / 2);
+    Vec3 cameraPos(VOXEL_SIZE * SCENE_SIZE / 2, -30, VOXEL_SIZE * SCENE_SIZE / 2);
     Vec3 cameraDir(0, 1, 0);
 
     // Camera parameters
     int xFOV = 70;
-    int yFOV = 40;
+    int yFOV = 60;
     
-    // For every background pixel (black) shoot ray at corresponding angle
     int W = img.get_width(), H = img.get_height();
 
+    // Angles of rays shot from each pixel
     double oneTickX = (double) xFOV / (double) W;
     double oneTickY = (double) yFOV / (double) H;
     double startAngleX = (double) -xFOV / 2.0;
     double startAngleY = (double) -yFOV / 2.0;
     double angleX, angleY;
 
-    for(int x=0; x<W; x++){
-        for(int y=0; y<H; y++){
-            Pixel pixel = img.get_pixel(x, y);
-            // Dont remove voxels for object pixels
-            if(pixel.r == 255 && pixel.g == 255 && pixel.b == 255) continue;
+    int N_IMAGES = 36;
+    double angle;
 
-            angleX = (startAngleX + x * oneTickX) / 90.0;
-            angleY = (startAngleY + y * oneTickY) / 90.0;
-            Vec3 dir{angleX + cameraDir.x, cameraDir.y, angleY + cameraDir.z};
-            Ray r(dir, cameraPos);
+    for(int i=0; i<N_IMAGES; i++){
+        // Rotate camera direction
+        cameraDir.x = cameraDir.x * std::cos(360.0 / N_IMAGES) - cameraDir.y * std::sin(360.0 / N_IMAGES);
+        cameraDir.y = cameraDir.x * std::sin(360.0 / N_IMAGES) - cameraDir.y * std::cos(360.0 / N_IMAGES);
 
-            rayGridTraversal(r, voxels, box);
+        // For origin, translate to origin, do the same and add offset
+
+        for(int x=0; x<W; x++){
+            for(int y=0; y<H; y++){
+                Pixel pixel = img.get_pixel(x, y);
+                // Dont remove voxels for object pixels
+                if(pixel.r == 255 && pixel.g == 255 && pixel.b == 255) continue;
+
+                angleX = (startAngleX + x * oneTickX) / 90.0;
+                angleY = (startAngleY + y * oneTickY) / 90.0;
+                Vec3 dir{angleX + cameraDir.x, cameraDir.y, angleY + cameraDir.z};
+                Ray r(dir, cameraPos);
+
+                rayGridTraversal(r, voxels, box);
+            }
         }
     }
 

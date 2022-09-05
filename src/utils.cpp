@@ -214,7 +214,6 @@ void rayGridTraversal(Ray& ray, Voxels& voxels, const AABB& box){
     double yt = std::abs((yBound - enterPoint.y) / (ray.dir.y + 1e-6));
     double zt = std::abs((zBound - enterPoint.z) / (ray.dir.z + 1e-6));
 
-    std::cout << xt << ", " << yt << ", " << zt << std::endl;
     // Time needed to travel through voxel for each axis
     double xDelta = VOXEL_SIZE * xDir / (ray.dir.x + 1e-6);
     double yDelta = VOXEL_SIZE * yDir / (ray.dir.y + 1e-6);
