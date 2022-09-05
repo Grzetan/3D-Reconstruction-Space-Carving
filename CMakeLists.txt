@@ -35,6 +35,7 @@ set(SOURCE_FILES
         ${PATH}/types.h
         ${PATH}/utils.h
         ${PATH}/utils.cpp
+        ${PATH}/bmplib.h
         )
 
 add_executable(main ${PATH}/main.cpp ${SOURCE_FILES})
