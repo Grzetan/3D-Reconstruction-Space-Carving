@@ -19,8 +19,11 @@ int main(int argc, char *argv[]){
     BMP img("./images/whiteBox.bmp");
 
     // Camera position and rotation in real world relative to center of turn table
-    Vec3 cameraPos(VOXEL_SIZE * SCENE_SIZE / 2, -30, VOXEL_SIZE * SCENE_SIZE / 2);
+    Vec3 cameraPos(VOXEL_SIZE * SCENE_SIZE / 2, -1, VOXEL_SIZE * SCENE_SIZE / 2);
     Vec3 cameraDir(0, 1, 0);
+
+    // Voxel grid center
+    Vec3 gridCenter(VOXEL_SIZE * SCENE_SIZE / 2, VOXEL_SIZE * SCENE_SIZE / 2, VOXEL_SIZE * SCENE_SIZE / 2);
 
     // Camera parameters
     int xFOV = 70;
@@ -35,15 +38,24 @@ int main(int argc, char *argv[]){
     double startAngleY = (double) -yFOV / 2.0;
     double angleX, angleY;
 
-    int N_IMAGES = 36;
-    double angle;
+    int N_IMAGES = 1;
+    double angle = 0.5*M_PI / N_IMAGES;
+
+    // Vertices v;
 
     for(int i=0; i<N_IMAGES; i++){
-        // Rotate camera direction
-        cameraDir.x = cameraDir.x * std::cos(360.0 / N_IMAGES) - cameraDir.y * std::sin(360.0 / N_IMAGES);
-        cameraDir.y = cameraDir.x * std::sin(360.0 / N_IMAGES) - cameraDir.y * std::cos(360.0 / N_IMAGES);
+        // Rotate camera direction and position
+        Vec3 offset = cameraPos - gridCenter;
+        rotateAroundZAxis(offset, angle);
+        cameraPos = offset + gridCenter;
 
-        // For origin, translate to origin, do the same and add offset
+        rotateAroundZAxis(cameraDir, angle);
+
+        std::cout << cameraDir.x << ", " << cameraDir.y << ", " << cameraDir.z << std::endl;
+        std::cout << cameraPos.x << ", " << cameraPos.y << ", " << cameraPos.z << std::endl;
+
+        // v.push_back({cameraDir.x, cameraDir.y, cameraDir.z});
+        // v.push_back({cameraPos.x, cameraPos.y, cameraPos.z});
 
         for(int x=0; x<W; x++){
             for(int y=0; y<H; y++){
@@ -53,8 +65,11 @@ int main(int argc, char *argv[]){
 
                 angleX = (startAngleX + x * oneTickX) / 90.0;
                 angleY = (startAngleY + y * oneTickY) / 90.0;
-                Vec3 dir{angleX + cameraDir.x, cameraDir.y, angleY + cameraDir.z};
+                Vec3 dir{angleX + cameraDir.x, angleY + cameraDir.y, cameraDir.z};
                 Ray r(dir, cameraPos);
+
+                // std::cout << dir.x << ", " << dir.y << ", " << dir.z << std::endl;
+
 
                 rayGridTraversal(r, voxels, box);
             }
@@ -62,6 +77,10 @@ int main(int argc, char *argv[]){
     }
 
     std::cout << img.get_width() << ", " << img.get_height() << std::endl;
+
+    // happly::PLYData out;
+    // out.addVertexPositions(v);
+    // out.write("test.ply");
 
     generateVoxels(voxels);
     return 0;

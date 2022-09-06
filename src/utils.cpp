@@ -247,3 +247,13 @@ void rayGridTraversal(Ray& ray, Voxels& voxels, const AABB& box){
         }
     }
 }
+
+void rotateAroundZAxis(Vec3& v, double angle){
+    double l = v.len();
+    double x = v.x * std::cos(angle) - v.y * std::sin(angle);
+    double y = v.x * std::sin(angle) + v.y * std::cos(angle);
+    v.x = x;
+    v.y = y;
+    v.normalize();
+    v = v * l;
+}

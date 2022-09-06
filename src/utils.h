@@ -21,3 +21,5 @@ bool rayAABBIntersection(const Ray& ray,
                          double& tend);
 
 void rayGridTraversal(Ray& ray, Voxels& voxels, const AABB& box);
+
+void rotateAroundZAxis(Vec3& v, double angle);

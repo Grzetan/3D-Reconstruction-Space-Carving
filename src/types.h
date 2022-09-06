@@ -4,6 +4,7 @@
 #include <vector>
 #include <array>
 #include <map>
+#include <cmath>
 
 #define SCENE_SIZE 100
 #define VOXEL_SIZE 0.2
@@ -32,8 +33,23 @@ public:
         return {x+v.x, y+v.y, z+v.z};
     }
 
+    Vec3 operator-(Vec3 v){
+        return {x-v.x, y-v.y, z-v.z};
+    }
+
     Vec3 operator+(double a){
         return {x+a, y+a, z+a};
+    }
+
+    double len(){
+        return std::sqrt(x*x + y*y + z*z);
+    }
+
+    void normalize(){
+        double length = len();
+        x /= length;
+        y /= length;
+        z /= length;
     }
 };
 
