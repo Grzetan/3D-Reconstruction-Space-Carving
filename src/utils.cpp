@@ -257,3 +257,26 @@ void rotateAroundZAxis(Vec3& v, double angle){
     v.normalize();
     v = v * l;
 }
+
+double degrees2radians(double degrees){
+    return degrees * (M_PI / 180.0);
+}
+
+Vec3 rotateUsingQuaterion(Vec3& v, double angle, RotationType type){
+    // Find axis to rotate about (Vec3 is initialized with 0s)
+    Vec3 axis;
+    if(type == RotationType::LEFT_RIGHT){
+        axis.z = 1;
+    }else if(type == RotationType::UP_DOWN){
+        axis.x = v.y;
+        axis.y = -v.x;
+    }
+
+    Quaternion R(angle, axis);
+    Quaternion P(v);
+    Quaternion invR = R.inverse();
+
+    Quaternion newP = R.hamilton(P).hamilton(invR);
+
+    return {newP.b, newP.c, newP.d};
+}

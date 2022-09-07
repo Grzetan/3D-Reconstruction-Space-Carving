@@ -39,49 +39,69 @@ int main(int argc, char *argv[]){
     double angleX, angleY;
 
     int N_IMAGES = 1;
-    double angle = 0.5*M_PI / N_IMAGES;
+    double angle = 0.25*M_PI / N_IMAGES;
 
-    // Vertices v;
+    Vertices v;
 
-    for(int i=0; i<N_IMAGES; i++){
-        // Rotate camera direction and position
-        Vec3 offset = cameraPos - gridCenter;
-        rotateAroundZAxis(offset, angle);
-        cameraPos = offset + gridCenter;
+    rotateAroundZAxis(cameraDir, angle);
 
-        rotateAroundZAxis(cameraDir, angle);
+    // v.push_back({cameraDir.x, cameraDir.y, cameraDir.z});
 
-        std::cout << cameraDir.x << ", " << cameraDir.y << ", " << cameraDir.z << std::endl;
-        std::cout << cameraPos.x << ", " << cameraPos.y << ", " << cameraPos.z << std::endl;
+    // rotateUsingQuaterion(cameraDir, M_PI / 4, RotationType::UP_DOWN);
 
-        // v.push_back({cameraDir.x, cameraDir.y, cameraDir.z});
-        // v.push_back({cameraPos.x, cameraPos.y, cameraPos.z});
+    // v.push_back({cameraDir.x, cameraDir.y, cameraDir.z});
 
-        for(int x=0; x<W; x++){
-            for(int y=0; y<H; y++){
-                Pixel pixel = img.get_pixel(x, y);
-                // Dont remove voxels for object pixels
-                if(pixel.r == 255 && pixel.g == 255 && pixel.b == 255) continue;
+    for(int x=0; x<W; x++){
+        for(int y=0; y<H; y++){
+            angleX = (startAngleX + x * oneTickX);
+            angleY = (startAngleY + y * oneTickY);
+            Vec3 pixelDir = rotateUsingQuaterion(cameraDir, degrees2radians(angleY), RotationType::UP_DOWN);
+            pixelDir = rotateUsingQuaterion(pixelDir, degrees2radians(angleX), RotationType::LEFT_RIGHT);
 
-                angleX = (startAngleX + x * oneTickX) / 90.0;
-                angleY = (startAngleY + y * oneTickY) / 90.0;
-                Vec3 dir{angleX + cameraDir.x, angleY + cameraDir.y, cameraDir.z};
-                Ray r(dir, cameraPos);
-
-                // std::cout << dir.x << ", " << dir.y << ", " << dir.z << std::endl;
-
-
-                rayGridTraversal(r, voxels, box);
-            }
+            v.push_back({pixelDir.x, pixelDir.y, pixelDir.z});
         }
     }
 
+    // for(int i=0; i<N_IMAGES; i++){
+    //     // Rotate camera direction and position
+    //     Vec3 offset = cameraPos - gridCenter;
+    //     rotateAroundZAxis(offset, angle);
+    //     cameraPos = offset + gridCenter;
+
+    //     rotateAroundZAxis(cameraDir, angle);
+
+    //     std::cout << cameraDir.x << ", " << cameraDir.y << ", " << cameraDir.z << std::endl;
+    //     std::cout << cameraPos.x << ", " << cameraPos.y << ", " << cameraPos.z << std::endl;
+
+    //     // v.push_back({cameraDir.x, cameraDir.y, cameraDir.z});
+    //     // v.push_back({cameraPos.x, cameraPos.y, cameraPos.z});
+
+    //     for(int x=0; x<W; x++){
+    //         for(int y=0; y<H; y++){
+    //             Pixel pixel = img.get_pixel(x, y);
+    //             // Dont remove voxels for object pixels
+    //             if(pixel.r == 255 && pixel.g == 255 && pixel.b == 255) continue;
+
+    //             angleX = (startAngleX + x * oneTickX);
+    //             angleY = (startAngleY + y * oneTickY);
+    //             std::cout << angleX << ", " << angleY << std::endl;
+    //             // Vec3 dir{angleX + cameraDir.x, angleY + cameraDir.y, cameraDir.z};
+    //             // Ray r(dir, cameraPos);
+
+    //             // // std::cout << dir.x << ", " << dir.y << ", " << dir.z << std::endl;
+
+
+    //             // rayGridTraversal(r, voxels, box);
+    //         }
+    //     }
+    // }
+
     std::cout << img.get_width() << ", " << img.get_height() << std::endl;
 
-    // happly::PLYData out;
-    // out.addVertexPositions(v);
-    // out.write("test.ply");
+    happly::PLYData out;
+    out.addVertexPositions(v);
+    out.write("test.ply");
 
-    generateVoxels(voxels);
+    // generateVoxels(voxels);
     return 0;
 }

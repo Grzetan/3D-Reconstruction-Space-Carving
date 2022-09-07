@@ -57,6 +57,10 @@ typedef std::vector<bool> Voxels; // false = visible, true = notvisible (to avoi
 typedef std::vector<std::array<double, 3>> Vertices;
 typedef std::vector<std::vector<size_t>> Faces;
 
+enum RotationType{
+    UP_DOWN, LEFT_RIGHT
+};
+
 enum CubeFaces{
     LEFT=0, RIGHT=1, TOP=2, BOTTOM=3, FRONT=4, BACK=5
 };
@@ -99,5 +103,49 @@ public:
     AABB(Vec3 min, Vec3 max){
         bounds[0] = min;
         bounds[1] = max;
+    }
+};
+
+class Quaternion{
+public:
+    double a, b, c ,d;
+
+    Quaternion(double a_, double b_, double c_, double d_){
+        a = a_;
+        b = b_;
+        c = c_;
+        d = d_;
+    }
+
+    Quaternion(double angle, Vec3& v){
+        create(angle, v);
+    }
+
+    Quaternion(Vec3 v){
+        a = 0;
+        b = v.x;
+        c = v.y;
+        d = v.z;
+    }
+
+    void create(double angle, Vec3& v){
+        double tmp = std::sin(angle / 2.0f);
+        a = std::cos(angle / 2.0f);
+        b = tmp*v.x;
+        c = tmp*v.y;
+        d = tmp*v.z;
+    }
+
+    Quaternion inverse(){
+        return {a, -b, -c, -d};
+    }
+
+    Quaternion hamilton(Quaternion& q){
+        return {
+            a*q.a - b*q.b - c*q.c - d*q.d,
+            a*q.b + b*q.a + c*q.d - d*q.c,
+            a*q.c - b*q.d + c*q.a + d*q.b,
+            a*q.d + b*q.c - c*q.b + d*q.a
+        };
     }
 };

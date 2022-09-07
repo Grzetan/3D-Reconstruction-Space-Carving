@@ -23,3 +23,7 @@ bool rayAABBIntersection(const Ray& ray,
 void rayGridTraversal(Ray& ray, Voxels& voxels, const AABB& box);
 
 void rotateAroundZAxis(Vec3& v, double angle);
+
+Vec3 rotateUsingQuaterion(Vec3& v, double angle, RotationType type);
+
+double degrees2radians(double degrees);
