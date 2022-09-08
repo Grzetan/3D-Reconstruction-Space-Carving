@@ -12,6 +12,7 @@ CMakeFiles
 main
 *.ply
 .vscode
+photoshoot/*
 
 # Precompiled Headers
 *.gch

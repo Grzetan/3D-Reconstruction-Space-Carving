@@ -3,6 +3,7 @@
 #include <vector>
 #include <stdexcept>
 #include <iostream>
+#include <cstring>
 
 #pragma pack(push, 1)
 
@@ -52,6 +53,12 @@ struct BMP {
 
     BMP(const char *fname) {
         read(fname);
+    }
+
+    BMP(const std::string& fname){
+        char charArray[fname.length() + 1];
+        strcpy(charArray, fname.c_str());
+        read(charArray);
     }
 
     void read(const char *fname) {
