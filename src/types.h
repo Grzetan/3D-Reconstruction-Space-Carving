@@ -6,10 +6,6 @@
 #include <map>
 #include <cmath>
 
-#define SCENE_SIZE 200
-#define VOXEL_SIZE 0.2
-#define VOXEL_RL_SIZE 2 // In milimeters
-
 class Vec3{
 public:
     double x, y, z;
@@ -54,7 +50,19 @@ public:
     }
 };
 
-typedef std::vector<bool> Voxels; // false = visible, true = notvisible (to avoid filling vector with default values)
+struct Voxels{
+    int SCENE_SIZE;
+    double VOXEL_SIZE, VOXEL_RL_SIZE;
+    std::vector<bool> data; // false = visible, true = notvisible (to avoid filling vector with default values)
+
+    Voxels(int s_size, double v_size, double vrl_size){
+        SCENE_SIZE = s_size;
+        VOXEL_SIZE = v_size;
+        VOXEL_RL_SIZE = vrl_size;
+        data.reserve(SCENE_SIZE*SCENE_SIZE*SCENE_SIZE);
+    }
+};
+
 typedef std::vector<std::array<double, 3>> Vertices;
 typedef std::vector<std::vector<size_t>> Faces;
 

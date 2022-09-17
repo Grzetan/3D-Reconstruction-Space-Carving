@@ -3,28 +3,59 @@
 #include <algorithm>
 #include "happly.h"
 #include "types.h"
-#include "params.h"
 #include "utils.h"
 #include <map>
 #include <vector>
 #include "bmplib.h"
+#include "argparse.hpp"
+
+using namespace argparse;
 
 int main(int argc, char *argv[]){
-    std::cout << "Parsing params..." << std::endl;
+    std::cout << "Parsing arguments..." << std::endl;
 
-    Params p(argc, argv);
+    ArgumentParser args("Space Carving");
+
+    args.add_argument("--scene_size")
+           .default_value<int>(200)
+           .help("Number of voxels in each dimention")
+           .scan<'i', int>();
+
+    args.add_argument("--voxel_size")
+        .default_value<double>(0.2)
+        .help("Voxel size in Virtual world")
+        .scan<'g', double>();
+
+    args.add_argument("--voxel_rl_size")
+        .default_value<double>(1)
+        .help("Voxel size in real world")
+        .scan<'g', double>();
+
+    args.add_argument("path")
+        .help("Path to images");
+
+    try {
+        args.parse_args(argc, argv);
+    }
+    catch (const std::runtime_error& err) {
+        std::cerr << err.what() << std::endl;
+        std::cerr << args;
+        std::exit(1);
+    }
 
     // Create voxel grid
-    Voxels voxels = {};
-    voxels.reserve(SCENE_SIZE*SCENE_SIZE*SCENE_SIZE);
-    AABB box({0,0,0}, {VOXEL_SIZE*SCENE_SIZE, VOXEL_SIZE*SCENE_SIZE, VOXEL_SIZE*SCENE_SIZE});
+    Voxels voxels(args.get<int>("--scene_size"),
+                  args.get<double>("--voxel_size"),
+                  args.get<double>("--voxel_rl_size"));
+
+    AABB box({0,0,0}, {voxels.VOXEL_SIZE*voxels.SCENE_SIZE, voxels.VOXEL_SIZE*voxels.SCENE_SIZE, voxels.VOXEL_SIZE*voxels.SCENE_SIZE});
 
     // Camera position and rotation in real world relative to center of turn table
-    Vec3 cameraPos(VOXEL_SIZE * SCENE_SIZE / 2, -SCENE_SIZE*VOXEL_SIZE, VOXEL_SIZE * SCENE_SIZE / 2);
+    Vec3 cameraPos(voxels.VOXEL_SIZE * voxels.SCENE_SIZE / 2, -voxels.SCENE_SIZE*voxels.VOXEL_SIZE, voxels.VOXEL_SIZE * voxels.SCENE_SIZE / 2);
     Vec3 cameraDir(0, 1, 0);
 
     // Voxel grid center
-    Vec3 gridCenter(VOXEL_SIZE * SCENE_SIZE / 2, VOXEL_SIZE * SCENE_SIZE / 2, VOXEL_SIZE * SCENE_SIZE / 2);
+    Vec3 gridCenter(voxels.VOXEL_SIZE * voxels.SCENE_SIZE / 2, voxels.VOXEL_SIZE * voxels.SCENE_SIZE / 2, voxels.VOXEL_SIZE * voxels.SCENE_SIZE / 2);
 
     // Camera parameters
     double xFOV = 46.7;
@@ -35,7 +66,7 @@ int main(int argc, char *argv[]){
     std::cout << "Reading images..." << std::endl;
 
     // Get every image in provided path and sort them by filename
-    std::string path = "./ring/ring";
+    std::string path = args.get<std::string>("path");;
     auto dir = std::filesystem::directory_iterator(path);
     std::vector<std::string> images = {};
 
@@ -122,7 +153,7 @@ int main(int argc, char *argv[]){
 
     std::cout << std::endl << "Carving took: " << time_ << ". Average time per image: " << time_ / N_IMAGES << std::endl;
 
-    Vec3 bbox = getBoundingBox(voxels, VOXEL_RL_SIZE);
+    Vec3 bbox = getBoundingBox(voxels);
     std::cout << "Bounding box: (x: " << bbox.x << "mm, y: " << bbox.y << "mm, z: " << bbox.z << "mm)" << std::endl;
 
     std::cout << "Rendering carved space..." << std::endl;

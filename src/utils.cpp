@@ -1,19 +1,19 @@
 #include "utils.h"
 
-int idx(int x, int y, int z){
-    x = std::min(SCENE_SIZE-1, std::max(0, x));
-    y = std::min(SCENE_SIZE-1, std::max(0, y));
-    z = std::min(SCENE_SIZE-1, std::max(0, z));
+int idx(int x, int y, int z, Voxels& voxels){
+    x = std::min(voxels.SCENE_SIZE-1, std::max(0, x));
+    y = std::min(voxels.SCENE_SIZE-1, std::max(0, y));
+    z = std::min(voxels.SCENE_SIZE-1, std::max(0, z));
 
-    return x + y*SCENE_SIZE + z*SCENE_SIZE*SCENE_SIZE;
+    return x + y*voxels.SCENE_SIZE + z*voxels.SCENE_SIZE*voxels.SCENE_SIZE;
 }
 
 bool isCubeBackground(int x, int y, int z, Voxels& voxels){
-    if(x<0 || x>SCENE_SIZE-1 || y<0 || y>SCENE_SIZE-1 || z<0 || z>SCENE_SIZE-1){
+    if(x<0 || x>voxels.SCENE_SIZE-1 || y<0 || y>voxels.SCENE_SIZE-1 || z<0 || z>voxels.SCENE_SIZE-1){
         return true;
     }
 
-    return voxels[idx(x, y, z)];
+    return voxels.data[idx(x, y, z, voxels)];
 };
 
 size_t vIdx(Key key, UniqueVertices& uniqueVertices){
@@ -33,11 +33,11 @@ void generateVoxels(Voxels& voxels){
 
     int x,y,z;
 
-    for(x=0; x<SCENE_SIZE; x++){
-        for(y=0; y<SCENE_SIZE; y++){
-            for(z=0; z<SCENE_SIZE; z++){
+    for(x=0; x<voxels.SCENE_SIZE; x++){
+        for(y=0; y<voxels.SCENE_SIZE; y++){
+            for(z=0; z<voxels.SCENE_SIZE; z++){
                 // Draw voxel if val is true and there is at least one neighbour not visible
-                if(voxels[idx(x, y, z)] == false){
+                if(voxels.data[idx(x, y, z, voxels)] == false){
                     // If voxel is on the edge, skip neightbour test
                     // Check if all of the neighbours are visible, if so skip
                     
@@ -56,8 +56,8 @@ void generateVoxels(Voxels& voxels){
                     }
 
                     // Front, bottom, left
-                    double mainX = x * VOXEL_SIZE, mainY = y * VOXEL_SIZE, mainZ = z * VOXEL_SIZE;
-                    double offsetX = mainX + VOXEL_SIZE, offsetY = mainY + VOXEL_SIZE, offsetZ = mainZ + VOXEL_SIZE;
+                    double mainX = x * voxels.VOXEL_SIZE, mainY = y * voxels.VOXEL_SIZE, mainZ = z * voxels.VOXEL_SIZE;
+                    double offsetX = mainX + voxels.VOXEL_SIZE, offsetY = mainY + voxels.VOXEL_SIZE, offsetZ = mainZ + voxels.VOXEL_SIZE;
 
                     // Generate only visible faces
                     if(faceVisibility[LEFT]){
@@ -200,14 +200,14 @@ void rayGridTraversal(Ray& ray, Voxels& voxels, const AABB& box){
 
     int enterVoxel[3];
 
-    enterVoxel[0] = std::floor(enterPoint.x / (VOXEL_SIZE + -xDir * 1e-6));
-    enterVoxel[1] = std::floor(enterPoint.y / (VOXEL_SIZE + -yDir * 1e-6));
-    enterVoxel[2] = std::floor(enterPoint.z / (VOXEL_SIZE + -zDir * 1e-6));
+    enterVoxel[0] = std::floor(enterPoint.x / (voxels.VOXEL_SIZE + -xDir * 1e-6));
+    enterVoxel[1] = std::floor(enterPoint.y / (voxels.VOXEL_SIZE + -yDir * 1e-6));
+    enterVoxel[2] = std::floor(enterPoint.z / (voxels.VOXEL_SIZE + -zDir * 1e-6));
 
     // Get world position of grid boundaries ray is going to hit
-    double xBound = (xDir > 0 ? enterVoxel[0]+1 : enterVoxel[0]) * VOXEL_SIZE;
-    double yBound = (yDir > 0 ? enterVoxel[1]+1 : enterVoxel[1]) * VOXEL_SIZE;
-    double zBound = (zDir > 0 ? enterVoxel[2]+1 : enterVoxel[2]) * VOXEL_SIZE;
+    double xBound = (xDir > 0 ? enterVoxel[0]+1 : enterVoxel[0]) * voxels.VOXEL_SIZE;
+    double yBound = (yDir > 0 ? enterVoxel[1]+1 : enterVoxel[1]) * voxels.VOXEL_SIZE;
+    double zBound = (zDir > 0 ? enterVoxel[2]+1 : enterVoxel[2]) * voxels.VOXEL_SIZE;
 
     // Get the exact time of intersection with each boundary
     double xt = std::abs((xBound - enterPoint.x) / (ray.dir.x + 1e-6));
@@ -215,14 +215,14 @@ void rayGridTraversal(Ray& ray, Voxels& voxels, const AABB& box){
     double zt = std::abs((zBound - enterPoint.z) / (ray.dir.z + 1e-6));
 
     // Time needed to travel through voxel for each axis
-    double xDelta = VOXEL_SIZE * xDir / (ray.dir.x + 1e-6);
-    double yDelta = VOXEL_SIZE * yDir / (ray.dir.y + 1e-6);
-    double zDelta = VOXEL_SIZE * zDir / (ray.dir.z + 1e-6);
+    double xDelta = voxels.VOXEL_SIZE * xDir / (ray.dir.x + 1e-6);
+    double yDelta = voxels.VOXEL_SIZE * yDir / (ray.dir.y + 1e-6);
+    double zDelta = voxels.VOXEL_SIZE * zDir / (ray.dir.z + 1e-6);
 
     // What is the termination index for each axis
-    int xOut = xDir < 0 ? -1 : SCENE_SIZE;
-    int yOut = yDir < 0 ? -1 : SCENE_SIZE;
-    int zOut = zDir < 0 ? -1 : SCENE_SIZE;
+    int xOut = xDir < 0 ? -1 : voxels.SCENE_SIZE;
+    int yOut = yDir < 0 ? -1 : voxels.SCENE_SIZE;
+    int zOut = zDir < 0 ? -1 : voxels.SCENE_SIZE;
 
     xt = (xt <= 0) ? 100000 : xt;
     yt = (yt <= 0) ? 100000 : yt;
@@ -230,7 +230,7 @@ void rayGridTraversal(Ray& ray, Voxels& voxels, const AABB& box){
 
     // Traverse until exit
     while(true){
-        voxels[idx(enterVoxel[0], enterVoxel[1], enterVoxel[2])] = true;
+        voxels.data[idx(enterVoxel[0], enterVoxel[1], enterVoxel[2], voxels)] = true;
 
         if(xt < yt && xt < zt){
             enterVoxel[0] += xDir;
@@ -281,14 +281,14 @@ Vec3 rotateUsingQuaterion(Vec3& v, double angle, RotationType type){
     return {newP.b, newP.c, newP.d};
 }
 
-Vec3 getBoundingBox(Voxels& voxels, double rlSize){
+Vec3 getBoundingBox(Voxels& voxels){
     int x,y,z;
-    int minX=SCENE_SIZE, maxX=0, minY=SCENE_SIZE, maxY=0, minZ=SCENE_SIZE, maxZ=0;
+    int minX=voxels.SCENE_SIZE, maxX=0, minY=voxels.SCENE_SIZE, maxY=0, minZ=voxels.SCENE_SIZE, maxZ=0;
 
-    for(x=0; x<SCENE_SIZE; x++){
-        for(y=0; y<SCENE_SIZE; y++){
-            for(z=0; z<SCENE_SIZE; z++){
-                if(voxels[idx(x,y,z)]) continue;
+    for(x=0; x<voxels.SCENE_SIZE; x++){
+        for(y=0; y<voxels.SCENE_SIZE; y++){
+            for(z=0; z<voxels.SCENE_SIZE; z++){
+                if(voxels.data[idx(x,y,z,voxels)]) continue;
 
                 if(x < minX) minX = x;
                 if(x > maxX) maxX = x;
@@ -303,8 +303,8 @@ Vec3 getBoundingBox(Voxels& voxels, double rlSize){
     }
 
     return {
-        (maxX - minX) * rlSize,
-        (maxY - minY) * rlSize,
-        (maxZ - minZ) * rlSize
+        (maxX - minX) * voxels.VOXEL_RL_SIZE,
+        (maxY - minY) * voxels.VOXEL_RL_SIZE,
+        (maxZ - minZ) * voxels.VOXEL_RL_SIZE
     };
 }

@@ -30,8 +30,7 @@ set(PATH ./src)
 
 set(SOURCE_FILES
         ${PATH}/happly.h
-        ${PATH}/params.h
-        ${PATH}/params.cpp
+        ${PATH}/argparse.hpp
         ${PATH}/types.h
         ${PATH}/utils.h
         ${PATH}/utils.cpp

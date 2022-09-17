@@ -13,7 +13,7 @@ size_t vIdx(Key key, UniqueVertices& uniqueVertices);
 
 bool isCubeBackground(int x, int y, int z, Voxels& voxels);
 
-int idx(int x, int y, int z);
+int idx(int x, int y, int z, Voxels& voxels);
 
 bool rayAABBIntersection(const Ray& ray,
                          const AABB& box,
@@ -28,4 +28,4 @@ Vec3 rotateUsingQuaterion(Vec3& v, double angle, RotationType type);
 
 double degrees2radians(double degrees);
 
-Vec3 getBoundingBox(Voxels& voxels, double rlSize);
+Vec3 getBoundingBox(Voxels& voxels);
