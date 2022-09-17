@@ -18,20 +18,20 @@ int main(int argc, char *argv[]){
     AABB box({0,0,0}, {VOXEL_SIZE*SCENE_SIZE, VOXEL_SIZE*SCENE_SIZE, VOXEL_SIZE*SCENE_SIZE});
 
     // Camera position and rotation in real world relative to center of turn table
-    Vec3 cameraPos(VOXEL_SIZE * SCENE_SIZE / 2, -50, VOXEL_SIZE * SCENE_SIZE / 2);
+    Vec3 cameraPos(VOXEL_SIZE * SCENE_SIZE / 2, -15, VOXEL_SIZE * SCENE_SIZE / 2);
     Vec3 cameraDir(0, 1, 0);
 
     // Voxel grid center
     Vec3 gridCenter(VOXEL_SIZE * SCENE_SIZE / 2, VOXEL_SIZE * SCENE_SIZE / 2, VOXEL_SIZE * SCENE_SIZE / 2);
 
     // Camera parameters
-    double xFOV = 20;
-    double yFOV = 20;
+    double xFOV = 46.7;
+    double yFOV = 46.7;
     xFOV = degrees2radians(xFOV);
     yFOV = degrees2radians(yFOV);
 
     // Get every image in provided path and sort them by filename
-    std::string path = "./xd";
+    std::string path = "./images";
     auto dir = std::filesystem::directory_iterator(path);
     std::vector<std::string> images = {};
 
@@ -90,7 +90,7 @@ int main(int argc, char *argv[]){
             for(int y=0; y<H; y++){
                 Pixel pixel = img.get_pixel(x, y);
                 // Dont remove voxels for object pixels
-                if(!(pixel.r > 50 && pixel.r < 65 && pixel.g > 50 && pixel.g < 65 && pixel.b > 50 && pixel.b < 65)) continue;
+                if(pixel.r != 0 && pixel.g != 0 && pixel.b != 0) continue;
 
                 angleX = (startAngleX + x * oneTickX);
                 angleY = (startAngleY + y * oneTickY);

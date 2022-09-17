@@ -6,7 +6,7 @@
 #include <map>
 #include <cmath>
 
-#define SCENE_SIZE 100
+#define SCENE_SIZE 200
 #define VOXEL_SIZE 0.2
 
 class Vec3{
