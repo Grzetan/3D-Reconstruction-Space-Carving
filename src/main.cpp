@@ -10,6 +10,8 @@
 #include "bmplib.h"
 
 int main(int argc, char *argv[]){
+    std::cout << "Parsing params ..." << std::endl;
+
     Params p(argc, argv);
 
     // Create voxel grid
@@ -18,7 +20,7 @@ int main(int argc, char *argv[]){
     AABB box({0,0,0}, {VOXEL_SIZE*SCENE_SIZE, VOXEL_SIZE*SCENE_SIZE, VOXEL_SIZE*SCENE_SIZE});
 
     // Camera position and rotation in real world relative to center of turn table
-    Vec3 cameraPos(VOXEL_SIZE * SCENE_SIZE / 2, -15, VOXEL_SIZE * SCENE_SIZE / 2);
+    Vec3 cameraPos(VOXEL_SIZE * SCENE_SIZE / 2, -SCENE_SIZE*VOXEL_SIZE, VOXEL_SIZE * SCENE_SIZE / 2);
     Vec3 cameraDir(0, 1, 0);
 
     // Voxel grid center
@@ -30,8 +32,10 @@ int main(int argc, char *argv[]){
     xFOV = degrees2radians(xFOV);
     yFOV = degrees2radians(yFOV);
 
+    std::cout << "Reading images..." << std::endl;
+
     // Get every image in provided path and sort them by filename
-    std::string path = "./images";
+    std::string path = "./out";
     auto dir = std::filesystem::directory_iterator(path);
     std::vector<std::string> images = {};
 
@@ -74,7 +78,10 @@ int main(int argc, char *argv[]){
     int N_IMAGES = images.size();
     double angle = 2*M_PI / N_IMAGES;
 
+    std::cout << "Carving space..." << std::endl;
+
     for(int i=0; i<N_IMAGES; i++){
+        std::cout << "Image " << i << std::endl;
         // Read current image
         BMP img(images[i]);
 
@@ -102,6 +109,8 @@ int main(int argc, char *argv[]){
             }
         }
     }
+
+    std::cout << "Rendering carved space" << std::endl;
 
     generateVoxels(voxels);
     return 0;
