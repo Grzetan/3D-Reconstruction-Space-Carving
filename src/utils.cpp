@@ -280,3 +280,31 @@ Vec3 rotateUsingQuaterion(Vec3& v, double angle, RotationType type){
 
     return {newP.b, newP.c, newP.d};
 }
+
+Vec3 getBoundingBox(Voxels& voxels, double rlSize){
+    int x,y,z;
+    int minX=SCENE_SIZE, maxX=0, minY=SCENE_SIZE, maxY=0, minZ=SCENE_SIZE, maxZ=0;
+
+    for(x=0; x<SCENE_SIZE; x++){
+        for(y=0; y<SCENE_SIZE; y++){
+            for(z=0; z<SCENE_SIZE; z++){
+                if(voxels[idx(x,y,z)]) continue;
+
+                if(x < minX) minX = x;
+                if(x > maxX) maxX = x;
+
+                if(y < minY) minY = y;
+                if(y > maxY) maxY = y;
+
+                if(z < minZ) minZ = z;
+                if(z > maxZ) maxZ = z;
+            }
+        }
+    }
+
+    return {
+        (maxX - minX) * rlSize,
+        (maxY - minY) * rlSize,
+        (maxZ - minZ) * rlSize
+    };
+}

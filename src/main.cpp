@@ -10,7 +10,7 @@
 #include "bmplib.h"
 
 int main(int argc, char *argv[]){
-    std::cout << "Parsing params ..." << std::endl;
+    std::cout << "Parsing params..." << std::endl;
 
     Params p(argc, argv);
 
@@ -35,7 +35,7 @@ int main(int argc, char *argv[]){
     std::cout << "Reading images..." << std::endl;
 
     // Get every image in provided path and sort them by filename
-    std::string path = "./out";
+    std::string path = "./ring/ring";
     auto dir = std::filesystem::directory_iterator(path);
     std::vector<std::string> images = {};
 
@@ -80,8 +80,12 @@ int main(int argc, char *argv[]){
 
     std::cout << "Carving space..." << std::endl;
 
+    auto start = std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::system_clock::now().time_since_epoch()
+    );
+
     for(int i=0; i<N_IMAGES; i++){
-        std::cout << "Image " << i << std::endl;
+        std::cout << "Image " << i << "/" << N_IMAGES << "\t\r" << std::flush;
         // Read current image
         BMP img(images[i]);
 
@@ -110,7 +114,18 @@ int main(int argc, char *argv[]){
         }
     }
 
-    std::cout << "Rendering carved space" << std::endl;
+    auto end = std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::system_clock::now().time_since_epoch()
+    );
+
+    auto time_ = end.count() - start.count();
+
+    std::cout << std::endl << "Carving took: " << time_ << ". Average time per image: " << time_ / N_IMAGES << std::endl;
+
+    Vec3 bbox = getBoundingBox(voxels, VOXEL_RL_SIZE);
+    std::cout << "Bounding box: (x: " << bbox.x << "mm, y: " << bbox.y << "mm, z: " << bbox.z << "mm)" << std::endl;
+
+    std::cout << "Rendering carved space..." << std::endl;
 
     generateVoxels(voxels);
     return 0;

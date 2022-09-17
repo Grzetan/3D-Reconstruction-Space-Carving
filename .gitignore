@@ -10,7 +10,7 @@ CMakeFiles
 *.o
 *.obj
 main
-*.ply
+output.ply
 .vscode
 photoshoot/*
 

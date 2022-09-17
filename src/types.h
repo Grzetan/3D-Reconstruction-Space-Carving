@@ -8,6 +8,7 @@
 
 #define SCENE_SIZE 200
 #define VOXEL_SIZE 0.2
+#define VOXEL_RL_SIZE 2 // In milimeters
 
 class Vec3{
 public:
