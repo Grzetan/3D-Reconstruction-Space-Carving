@@ -31,6 +31,11 @@ int main(int argc, char *argv[]){
         .help("Voxel size in real world")
         .scan<'g', double>();
 
+    args.add_argument("--marching_cubes")
+           .help("Use marching cubes algorithm when generating output PLY")
+           .default_value(false)
+           .implicit_value(true);
+
     args.add_argument("path")
         .help("Path to images");
 
@@ -51,7 +56,7 @@ int main(int argc, char *argv[]){
     AABB box({0,0,0}, {voxels.VOXEL_SIZE*voxels.SCENE_SIZE, voxels.VOXEL_SIZE*voxels.SCENE_SIZE, voxels.VOXEL_SIZE*voxels.SCENE_SIZE});
 
     // Camera position and rotation in real world relative to center of turn table
-    Vec3 cameraPos(voxels.VOXEL_SIZE * voxels.SCENE_SIZE / 2, -voxels.SCENE_SIZE*voxels.VOXEL_SIZE, voxels.VOXEL_SIZE * voxels.SCENE_SIZE / 2);
+    Vec3 cameraPos(voxels.VOXEL_SIZE * voxels.SCENE_SIZE / 2, -0.9*voxels.SCENE_SIZE*voxels.VOXEL_SIZE, voxels.VOXEL_SIZE * voxels.SCENE_SIZE / 2);
     Vec3 cameraDir(0, 1, 0);
 
     // Voxel grid center
@@ -158,6 +163,11 @@ int main(int argc, char *argv[]){
 
     std::cout << "Rendering carved space..." << std::endl;
 
-    generateVoxels(voxels);
+    if(args.get<bool>("--marching_cubes")){
+        generateVoxelsMarchingCubes(voxels);
+    }else{
+        generateVoxels(voxels);
+    }
+    
     return 0;
 }

@@ -9,6 +9,8 @@
 
 void generateVoxels(Voxels& voxels);
 
+void generateVoxelsMarchingCubes(Voxels& voxels);
+
 size_t vIdx(Key key, UniqueVertices& uniqueVertices);
 
 bool isCubeBackground(int x, int y, int z, Voxels& voxels);
