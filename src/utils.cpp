@@ -154,105 +154,52 @@ void generateVoxelsMarchingCubes(Voxels& voxels){
     for(x=0; x<voxels.SCENE_SIZE; x++){
         for(y=0; y<voxels.SCENE_SIZE; y++){
             for(z=0; z<voxels.SCENE_SIZE; z++){
-                // Draw voxel if val is true and there is at least one neighbour not visible
                 if(voxels.data[idx(x, y, z, voxels)] == false){
-                    // If voxel is on the edge, skip neightbour test
-                    // Check if all of the neighbours are visible, if so skip
-                    
-                    FaceVisMap faceVisibility;
-                    faceVisibility[LEFT] = false;
-                    faceVisibility[RIGHT] = false;
-                    faceVisibility[TOP] = false;
-                    faceVisibility[BOTTOM] = false;
-                    faceVisibility[FRONT] = false;
-                    faceVisibility[BACK] = false;
+                    int shapeIdx = 0;
 
+                    // Find combination idx
                     for(int i=0; i<GUIDE.size(); i++){
                         int cx, cy, cz;
                         std::tie(cx, cy, cz) = GUIDE[i];
-                        faceVisibility[CubeFaces(i)] = isCubeBackground(x+cx, y+cy, z+cz, voxels);
+                        if(isCubeBackground(x+cx, y+cy, z+cz, voxels)){
+                            for(int activeVertex : ACTIVE_VERTICES[i]){
+                                shapeIdx |= 1 << activeVertex;
+                            }
+                        }
                     }
 
-                    // Front, bottom, left
-                    double mainX = x * voxels.VOXEL_SIZE, mainY = y * voxels.VOXEL_SIZE, mainZ = z * voxels.VOXEL_SIZE;
-                    double offsetX = mainX + voxels.VOXEL_SIZE, offsetY = mainY + voxels.VOXEL_SIZE, offsetZ = mainZ + voxels.VOXEL_SIZE;
+                    if(shapeIdx == 0 || shapeIdx == 255) continue;
 
-                    // Generate only visible faces
-                    if(faceVisibility[LEFT]){
-                        Key keyA = {mainX, offsetY, mainZ};
-                        Key keyB = {mainX, mainY, mainZ};
-                        Key keyC = {mainX, mainY, offsetZ};
-                        Key keyD = {mainX, offsetY, offsetZ};
 
-                        faces.push_back({vIdx(keyA, uniqueVertices), vIdx(keyB, uniqueVertices), vIdx(keyC, uniqueVertices)});
-                        faces.push_back({vIdx(keyA, uniqueVertices), vIdx(keyD, uniqueVertices), vIdx(keyC, uniqueVertices)});
-                    }
-
-                    if(faceVisibility[RIGHT]){
-                        Key keyA = {offsetX, offsetY, mainZ};
-                        Key keyB = {offsetX, mainY, mainZ};
-                        Key keyC = {offsetX, mainY, offsetZ};
-                        Key keyD = {offsetX, offsetY, offsetZ};
-
-                        faces.push_back({vIdx(keyA, uniqueVertices), vIdx(keyB, uniqueVertices), vIdx(keyC, uniqueVertices)});
-                        faces.push_back({vIdx(keyA, uniqueVertices), vIdx(keyD, uniqueVertices), vIdx(keyC, uniqueVertices)});
-                    }
-
-                    if(faceVisibility[TOP]){
-                        Key keyA = {mainX, offsetY, mainZ};
-                        Key keyB = {offsetX, offsetY, mainZ};
-                        Key keyC = {mainX, offsetY, offsetZ};
-                        Key keyD = {offsetX, offsetY, offsetZ};
-
-                        faces.push_back({vIdx(keyA, uniqueVertices), vIdx(keyB, uniqueVertices), vIdx(keyC, uniqueVertices)});
-                        faces.push_back({vIdx(keyD, uniqueVertices), vIdx(keyB, uniqueVertices), vIdx(keyC, uniqueVertices)});
-                    }
-
-                    if(faceVisibility[BOTTOM]){
-                        Key keyA = {mainX, mainY, mainZ};
-                        Key keyB = {offsetX, mainY, mainZ};
-                        Key keyC = {mainX, mainY, offsetZ};
-                        Key keyD = {offsetX, mainY, offsetZ};
-
-                        faces.push_back({vIdx(keyA, uniqueVertices), vIdx(keyB, uniqueVertices), vIdx(keyC, uniqueVertices)});
-                        faces.push_back({vIdx(keyD, uniqueVertices), vIdx(keyB, uniqueVertices), vIdx(keyC, uniqueVertices)});
-                    }
-
-                    if(faceVisibility[FRONT]){
-                        Key keyA = {mainX, mainY, mainZ};
-                        Key keyB = {mainX, offsetY, mainZ};
-                        Key keyC = {offsetX, mainY, mainZ};
-                        Key keyD = {offsetX, offsetY, mainZ};
-
-                        faces.push_back({vIdx(keyA, uniqueVertices), vIdx(keyB, uniqueVertices), vIdx(keyC, uniqueVertices)});
-                        faces.push_back({vIdx(keyD, uniqueVertices), vIdx(keyB, uniqueVertices), vIdx(keyC, uniqueVertices)});
-                    }
-
-                    if(faceVisibility[BACK]){
-                        Key keyA = {mainX, mainY, offsetZ};
-                        Key keyB = {mainX, offsetY, offsetZ};
-                        Key keyC = {offsetX, mainY, offsetZ};
-                        Key keyD = {offsetX, offsetY, offsetZ};
-
-                        faces.push_back({vIdx(keyA, uniqueVertices), vIdx(keyB, uniqueVertices), vIdx(keyC, uniqueVertices)});
-                        faces.push_back({vIdx(keyD, uniqueVertices), vIdx(keyB, uniqueVertices), vIdx(keyC, uniqueVertices)});
+                    // vertices.push_back({x*voxels.VOXEL_SIZE,y*voxels.VOXEL_SIZE,z*voxels.VOXEL_SIZE});
+                    // vertices.push_back({x*voxels.VOXEL_SIZE+voxels.VOXEL_SIZE, y*voxels.VOXEL_SIZE, z*voxels.VOXEL_SIZE});
+                    // vertices.push_back({x*voxels.VOXEL_SIZE, y*voxels.VOXEL_SIZE+voxels.VOXEL_SIZE, z*voxels.VOXEL_SIZE});
+                    // faces.push_back({vertices.size() - 3, vertices.size() - 2, vertices.size() - 1});
+                    for(int i=0; i<5; i++){
+                        if(triTable[shapeIdx][i*3] == -1) break;
+                        for(int j=0; j<3; j++){
+                            vertices.push_back({x*voxels.VOXEL_SIZE+edgeTable[triTable[shapeIdx][i*3+j]][0]*voxels.VOXEL_SIZE, 
+                                                y*voxels.VOXEL_SIZE+edgeTable[triTable[shapeIdx][i*3+j]][1]*voxels.VOXEL_SIZE, 
+                                                z*voxels.VOXEL_SIZE+edgeTable[triTable[shapeIdx][i*3+j]][2]*voxels.VOXEL_SIZE});
+                        }
+                        faces.push_back({vertices.size() - 3, vertices.size() - 2, vertices.size() - 1});
                     }
                 }
             }
         }
     }
 
-    double x1, y1, z1;
-    vertices.reserve(uniqueVertices.size());
-    for(int i=0; i<uniqueVertices.size(); i++){
-        vertices.push_back({0,0,0});
-    }
+    // double x1, y1, z1;
+    // vertices.reserve(uniqueVertices.size());
+    // for(int i=0; i<uniqueVertices.size(); i++){
+    //     vertices.push_back({0,0,0});
+    // }
 
-    UniqueVertices::iterator it;
-    for(it=uniqueVertices.begin(); it!=uniqueVertices.end(); it++){
-        std::tie(x1,y1,z1) = it->first;
-        vertices[it->second] = {x1, y1, z1};
-    }
+    // UniqueVertices::iterator it;
+    // for(it=uniqueVertices.begin(); it!=uniqueVertices.end(); it++){
+    //     std::tie(x1,y1,z1) = it->first;
+    //     vertices[it->second] = {x1, y1, z1};
+    // }
 
     out.addVertexPositions(vertices);
     out.addFaceIndices(faces);
