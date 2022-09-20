@@ -161,6 +161,9 @@ int main(int argc, char *argv[]){
     Vec3 bbox = getBoundingBox(voxels);
     std::cout << "Bounding box: (x: " << bbox.x << "mm, y: " << bbox.y << "mm, z: " << bbox.z << "mm)" << std::endl;
 
+    Cylinder cylinder = getCylinder(voxels, bbox);
+    std::cout << "Cylinder: radius = " << cylinder.r << ", height = " << cylinder.h << ", center = (" << cylinder.center.x << ", " << cylinder.center.y << ", " << cylinder.center.z << ")" << std::endl;
+
     std::cout << "Rendering carved space..." << std::endl;
 
     if(args.get<bool>("--marching_cubes")){

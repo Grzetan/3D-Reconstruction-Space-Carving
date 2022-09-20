@@ -373,3 +373,23 @@ Vec3 getBoundingBox(Voxels& voxels){
         (maxZ - minZ) * voxels.VOXEL_RL_SIZE
     };
 }
+
+Cylinder getCylinder(Voxels& voxels, Vec3& bbox){
+    double maxDist = 0;
+    
+    int x,y,z;
+    for(x=0; x<voxels.SCENE_SIZE; x++){
+        for(y=0; y<voxels.SCENE_SIZE; y++){
+            for(z=0; z<voxels.SCENE_SIZE; z++){
+                if(voxels.data[idx(x,y,z,voxels)]) continue;
+
+                double distX = (x - voxels.SCENE_SIZE / 2) * voxels.VOXEL_RL_SIZE;
+                double distY = (y - voxels.SCENE_SIZE / 2) * voxels.VOXEL_RL_SIZE;
+                double dist = sqrt(distX*distX + distY*distY);
+                if(dist > maxDist) maxDist = dist;
+            }
+        }
+    }
+
+    return {maxDist, bbox.z, {voxels.SCENE_SIZE / 2 * voxels.VOXEL_RL_SIZE, voxels.SCENE_SIZE / 2 * voxels.VOXEL_RL_SIZE, 0}};
+}

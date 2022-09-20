@@ -31,3 +31,5 @@ Vec3 rotateUsingQuaterion(Vec3& v, double angle, RotationType type);
 double degrees2radians(double degrees);
 
 Vec3 getBoundingBox(Voxels& voxels);
+
+Cylinder getCylinder(Voxels& voxels, Vec3& bbox);
