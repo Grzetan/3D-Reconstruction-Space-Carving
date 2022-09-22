@@ -1,5 +1,10 @@
 #pragma once
-#include "src/api.h"
+#include "src/bmplib.h"
+#include "src/types.h"
+#include "src/utils.h"
+#include <cmath>
+#include <filesystem>
+#include <algorithm>
 
 #ifdef SPACE_CARVING_EXPORTS
 #define SPACE_CARVING_API __declspec(dllexport)
