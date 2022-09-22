@@ -176,8 +176,8 @@ struct Cylinder{
 };
 
 struct OutCylinder{
-    double r;
-    double h;
+    double radius;
+    double height;
 };
 
 // Relative coordinates of middle point on given edge
