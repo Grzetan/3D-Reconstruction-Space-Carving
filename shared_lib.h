@@ -5,7 +5,7 @@
     extern "C"{
 #endif
 
-#ifdef BUILD_MY_DLL
+#ifdef BUILD_MROLLER_GENERATOR_DLL
     #define SHARED_LIB __declspec(dllexport)
 #else
     #define SHARED_LIB __declspec(dllimport)
