@@ -13,7 +13,10 @@
     #define SHARED_LIB __declspec(dllimport)
 #endif
 
-//declaration of exported methods
+/// @brief Space carving
+/// @param path Path to folder with images (images should be .bmp and named incremental ex 0.bmp, 1.bmp, 2.bmp ...)
+/// @return Cylinder class with two properties: height and radius
+OutCylinder createBoundingCylinder(const char* path);
 
 /// @brief Space carving
 /// @param path Path to folder with images (images should be .bmp and named incremental ex 0.bmp, 1.bmp, 2.bmp ...)
@@ -23,11 +26,6 @@
 /// @param yFOV <1, 180> Camera's field of view in Y axis
 /// @return Cylinder class with two properties: height and radius
 OutCylinder createBoundingCylinder(const char* path, unsigned int sceneSize, double rlVoxelSize, double xFOV, double yFOV);
-
-/// @brief Space carving
-/// @param path Path to folder with images (images should be .bmp and named incremental ex 0.bmp, 1.bmp, 2.bmp ...)
-/// @return Cylinder class with two properties: height and radius
-OutCylinder createBoundingCylinder(const char* path);
 
 #ifdef __cplusplus
     }

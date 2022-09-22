@@ -12,4 +12,4 @@
 /// @param xFOV <1, 180> Camera's field od view in X axis
 /// @param yFOV <1, 180> Camera's field of view in Y axis
 /// @return Cylinder class with two properties: height and radius
-OutCylinder spaceCarve(const char* path, unsigned int sceneSize = 100, double rlVoxelSize = 1, double xFOV = 46.7, double yFOV = 46.7);
+OutCylinder spaceCarve(const char* path, unsigned int sceneSize, double rlVoxelSize, double xFOV, double yFOV);

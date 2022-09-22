@@ -2,7 +2,11 @@
 
 OutCylinder createBoundingCylinder(const char* path)
 {
-    return spaceCarve(path);
+    unsigned int sceneSize = 100;
+    double rlVoxelSize = 1;
+    double xFOV = 46.7;
+     double yFOV = 46.7;
+    return spaceCarve(path, sceneSize, rlVoxelSize, xFOV, yFOV);
 }
 
 
