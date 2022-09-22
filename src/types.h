@@ -175,6 +175,11 @@ struct Cylinder{
     Vec3 center;
 };
 
+struct OutCylinder{
+    double r;
+    double h;
+};
+
 // Relative coordinates of middle point on given edge
 const float edgeTable[12][3] = {
     {0.5, 0.0, 1.0}, // 0

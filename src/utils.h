@@ -33,3 +33,5 @@ double degrees2radians(double degrees);
 Vec3 getBoundingBox(Voxels& voxels);
 
 Cylinder getCylinder(Voxels& voxels, Vec3& bbox);
+
+OutCylinder getOutCylinder(Voxels& voxels, Vec3& bbox);
