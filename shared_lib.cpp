@@ -1,16 +1,19 @@
 #include "shared_lib.h"
 
-OutCylinder createBoundingCylinder(const char* path)
+static double _radius;
+static double _height;
+
+void createBoundingCylinder(const char* path, unsigned int sceneSize, double rlVoxelSize, double xFOV, double yFOV)
 {
-    unsigned int sceneSize = 100;
-    double rlVoxelSize = 1;
-    double xFOV = 46.7;
-     double yFOV = 46.7;
-    return spaceCarve(path, sceneSize, rlVoxelSize, xFOV, yFOV);
+    OutCylinder cylinder = spaceCarve(path, sceneSize, rlVoxelSize, xFOV, yFOV);
 }
 
-
-OutCylinder createBoundingCylinder(const char* path, unsigned int sceneSize, double rlVoxelSize, double xFOV, double yFOV)
+double getCylinderRadius()
 {
-    return spaceCarve(path, sceneSize, rlVoxelSize, xFOV, yFOV);
+    return _radius;
+}
+
+double getCylinderHeight()
+{
+    return _height;
 }
