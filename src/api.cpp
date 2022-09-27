@@ -48,7 +48,9 @@ OutCylinder spaceCarve(const char* path, unsigned int sceneSize = 100, double rl
     std::sort(images.begin(), images.end(), Comp());
 
     // Read sample image to get width and height
-    BMP sampleImg(images[0]);
+    bool valid = true;
+    BMP sampleImg(images[0], valid);
+    if(!valid) return {0,0};
 
     int W = sampleImg.get_width(), H = sampleImg.get_height();
 
@@ -64,7 +66,9 @@ OutCylinder spaceCarve(const char* path, unsigned int sceneSize = 100, double rl
 
     for(int i=0; i<N_IMAGES; i++){
         // Read current image
-        BMP img(images[i]);
+        bool valid = true;
+        BMP img(images[i], valid);
+        if(!valid) return {0,0};
 
         // Rotate camera direction and position
         Vec3 offset = cameraPos - gridCenter;
@@ -76,7 +80,9 @@ OutCylinder spaceCarve(const char* path, unsigned int sceneSize = 100, double rl
         // For every pixel calculate it's direction and travere grid
         for(int x=0; x<W; x++){
             for(int y=0; y<H; y++){
-                Pixel pixel = img.get_pixel(x, y);
+                bool valid = true;
+                Pixel pixel = img.get_pixel(x, y, valid);
+                if(!valid) return {0,0};
                 // Dont remove voxels for object pixels
                 if(pixel.r != 0 && pixel.g != 0 && pixel.b != 0) continue;
 
