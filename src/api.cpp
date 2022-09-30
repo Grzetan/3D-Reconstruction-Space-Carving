@@ -1,6 +1,6 @@
 #include "api.h"
 
-OutCylinder spaceCarve(const char* path, unsigned int sceneSize = 100, double rlVoxelSize = 1, double xFOV = 46.7, double yFOV = 46.7){
+OutCylinder spaceCarve(const char* path, unsigned int sceneSize = 100, double rlVoxelSize = 1, double xFOV = 46.7, double yFOV = 46.7, int thresh = 60){
     // Create voxel grid
     Voxels voxels(sceneSize,
                   0.2,
@@ -84,7 +84,7 @@ OutCylinder spaceCarve(const char* path, unsigned int sceneSize = 100, double rl
                 Pixel pixel = img.get_pixel(x, y, valid);
                 if(!valid) return {0,0};
                 // Dont remove voxels for object pixels
-                if(pixel.r != 0 && pixel.g != 0 && pixel.b != 0) continue;
+                if(pixel.r > thresh || pixel.g > thresh || pixel.b > thresh) continue;
 
                 angleX = (startAngleX + x * oneTickX);
                 angleY = (startAngleY + y * oneTickY);

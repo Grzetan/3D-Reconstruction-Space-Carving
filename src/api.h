@@ -11,5 +11,6 @@
 /// @param rlVoxelSize (0, inf) Size of one voxel in real world
 /// @param xFOV <1, 180> Camera's field od view in X axis
 /// @param yFOV <1, 180> Camera's field of view in Y axis
+/// @param thresh <1, 255> Threshold which classifies which pixels are object.
 /// @return Cylinder class with two properties: height and radius
-OutCylinder spaceCarve(const char* path, unsigned int sceneSize, double rlVoxelSize, double xFOV, double yFOV);
+OutCylinder spaceCarve(const char* path, unsigned int sceneSize, double rlVoxelSize, double xFOV, double yFOV, int thresh);
