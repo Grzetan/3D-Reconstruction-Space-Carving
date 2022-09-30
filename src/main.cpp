@@ -31,6 +31,11 @@ int main(int argc, char *argv[]){
         .help("Voxel size in real world")
         .scan<'g', double>();
 
+    args.add_argument("--segmentation_thresh")
+        .default_value<int>(50)
+        .help("Color of an object")
+        .scan<'i', int>();
+
     args.add_argument("--marching_cubes")
            .help("Use marching cubes algorithm when generating output PLY")
            .default_value(false)
@@ -120,6 +125,8 @@ int main(int argc, char *argv[]){
             std::chrono::system_clock::now().time_since_epoch()
     );
 
+    const int THRESH = args.get<int>("--segmentation_thresh");
+
     for(int i=0; i<N_IMAGES; i++){
         std::cout << "Image " << i << "/" << N_IMAGES << "\t\r" << std::flush;
         // Read current image
@@ -137,7 +144,7 @@ int main(int argc, char *argv[]){
             for(int y=0; y<H; y++){
                 Pixel pixel = img.get_pixel(x, y);
                 // Dont remove voxels for object pixels
-                if(pixel.r != 0 && pixel.g != 0 && pixel.b != 0) continue;
+                if(pixel.r > THRESH && pixel.g > THRESH && pixel.b > THRESH) continue;
 
                 angleX = (startAngleX + x * oneTickX);
                 angleY = (startAngleY + y * oneTickY);
