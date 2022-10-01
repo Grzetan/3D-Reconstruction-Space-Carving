@@ -60,9 +60,9 @@ Space Carving is pretty simple algorithm for 3D reconstruction. I recommend thos
 https://www.youtube.com/watch?v=XpjWXDY8aes
 https://www.youtube.com/watch?v=cGs90KF4oTc
 The program takes in grayscale `.bmp` images of one object taken from different angles. Something like this:
-![img](./gallery/8.png)
+![gif](./docs_data/input_face.gif)
 and turns it into something like this:
-![img](./gallery/8.png)
+![gif](./docs_data/result_face.gif)
 It does so by first segmenting an image and shooting rays for every pixel and removing those voxels which get hit by `background ray`.
 `background ray` is a ray that corresponds to pixel qualified as background during segmentation phase.
 
@@ -76,6 +76,10 @@ In this phase program will shoot rays from different angles that will piece by p
 
 ### Generating model
 The last step is generating a `.ply` file with created object. Only visible faces will be generated to make this object as light as possible.
+
+Unfortunetly algorithm won't be able to detect holes, for example cup won't be carved inside because simple images do not contain any information about potential holes.
+
+For now program supports only one vertical position. Maybe in future I will extend it to support more vertical angles.
 
 ---
 
@@ -134,6 +138,7 @@ Example:
 
 # Gallery <a name="gallery"></a>
 
+![gif](./docs_data/result_buggy.gif)
 
 # Generate datasets in blender <a name="blender"></a>
 
@@ -149,6 +154,6 @@ TO create dataset with blender:
 
 5. Make object emit light using red sphere icon on the right sight and setting emit color to white.
 
-6. After loading object, click 'N' in "Rotation secting" below Z axis, enter #frame/X where X controls rotation speed (5.73 is 10degrees each frame).
+6. After loading object, click 'N' in "Rotation secting" below Z axis, enter #frame/X where X controls rotation speed (5.73 is 10degrees each frame for 73 frames).
 
 7. Generate dataset using 'Render' on the top left corner.
