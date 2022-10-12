@@ -144,7 +144,8 @@ int main(int argc, char *argv[]){
             for(int y=0; y<H; y++){
                 Pixel pixel = img.get_pixel(x, y);
                 // Dont remove voxels for object pixels
-                if(pixel.r > THRESH && pixel.g > THRESH && pixel.b > THRESH) continue;
+                // if(pixel.r > THRESH || pixel.g > THRESH || pixel.b > THRESH) continue;
+                if(pixel.b > 170) continue;
 
                 angleX = (startAngleX + x * oneTickX);
                 angleY = (startAngleY + y * oneTickY);
@@ -156,6 +157,10 @@ int main(int argc, char *argv[]){
             }
         }
     }
+
+    std::cout << "Removing small groups of voxels..." << std::endl;
+
+    removeSingleVoxels(voxels);
 
     auto end = std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::system_clock::now().time_since_epoch()

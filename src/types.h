@@ -63,6 +63,19 @@ struct Voxels{
     }
 };
 
+struct Vec3Int{
+    int x,y,z;
+};
+
+struct VoxelArea{
+    Vec3Int start;
+    Vec3Int end;
+
+    bool isValid(int minGroupSize = 10){
+        return end.x - start.x > minGroupSize || end.y - start.y > minGroupSize || end.z - start.z > minGroupSize;
+    }
+};
+
 typedef std::vector<std::array<double, 3>> Vertices;
 typedef std::vector<std::vector<size_t>> Faces;
 

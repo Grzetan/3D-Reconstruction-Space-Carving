@@ -8,6 +8,14 @@ int idx(int x, int y, int z, Voxels& voxels){
     return x + y*voxels.SCENE_SIZE + z*voxels.SCENE_SIZE*voxels.SCENE_SIZE;
 }
 
+bool getVoxelValue(Voxels& voxels, int x, int y, int z){
+    if(x < 0 || x >= voxels.SCENE_SIZE || y < 0 || y >= voxels.SCENE_SIZE || z < 0 || z >= voxels.SCENE_SIZE){
+        return true;
+    }
+
+    return voxels.data[x + y*voxels.SCENE_SIZE + z*voxels.SCENE_SIZE*voxels.SCENE_SIZE];
+}
+
 bool isCubeBackground(int x, int y, int z, Voxels& voxels){
     if(x<0 || x>voxels.SCENE_SIZE-1 || y<0 || y>voxels.SCENE_SIZE-1 || z<0 || z>voxels.SCENE_SIZE-1){
         return true;
@@ -412,4 +420,91 @@ OutCylinder getOutCylinder(Voxels& voxels, Vec3& bbox){
     }
 
     return {maxDist, bbox.z};
+}
+
+// Create voxel group
+void createGroup(Voxels& voxels, int x, int y, int z, std::vector<VoxelArea>& groups){
+    VoxelArea area{{x,y,z}, {x+1, y+1, z+1}};
+
+    int i,j;
+    bool expandedX = true, expandedY = true, expandedZ = true;
+
+    while(expandedX || expandedY || expandedZ){
+        expandedX = false;
+        expandedY = false;
+        expandedZ = false;
+
+        // Check if there are any voxels on "end" back perimiter (z const)
+        for(i=area.start.x; i<=area.end.x; i++){
+            for(j=area.start.y; j<=area.start.y; j++){
+                if(!getVoxelValue(voxels, i,j,area.end.z)){
+                    area.end.z++;
+                    expandedZ = true;
+                }
+            }
+        }
+
+        // Check if there are any voxels on "end" right perimiter (x const)
+        for(i=area.start.y; i<=area.end.y; i++){
+            for(j=area.start.z; j<=area.start.z; j++){
+                if(!getVoxelValue(voxels, area.end.x,i,j)){
+                    area.end.x++;
+                    expandedX = true;
+                }
+            }
+        }
+
+        // Check if there are any voxels on "end" bottom perimiter (y const)
+        for(i=area.start.x; i<=area.end.x; i++){
+            for(j=area.start.z; j<=area.start.z; j++){
+                if(!getVoxelValue(voxels, i,area.end.y,j)){
+                    area.end.y++;
+                    expandedY = true;
+                }
+            }
+        }
+    }
+
+    groups.push_back(area);
+}
+
+// Remove voxels small groups of voxels so they don't ruin "out cylinder"
+void removeSingleVoxels(Voxels& voxels){
+    int x,y,z;
+
+    std::vector<VoxelArea> detectedGroups = {};
+
+    for(x=0; x<voxels.SCENE_SIZE; x++){
+        for(y=0; y<voxels.SCENE_SIZE; y++){
+            for(z=0; z<voxels.SCENE_SIZE; z++){
+                if(voxels.data[idx(x,y,z,voxels)]) continue;
+
+                // If voxel is already in group, skip
+                bool isInGroup = false;
+                for(auto& group : detectedGroups){
+                    if(x >= group.start.x && y >= group.start.y && z >= group.start.z && 
+                       x <= group.end.x && y <= group.end.y && z <= group.end.z){
+                        if(!group.isValid()) voxels.data[idx(x,y,z,voxels)] = true;
+                        isInGroup = true;
+                        break;
+                    }
+                }
+                if(isInGroup) continue;
+                
+
+                createGroup(voxels, x,y,z, detectedGroups);
+                if(!detectedGroups[detectedGroups.size() - 1].isValid()) voxels.data[idx(x,y,z,voxels)] = true;
+                // if(getVoxelValue(voxels, x,y,z-1) && 
+                //    getVoxelValue(voxels, x,y,z+1) &&
+                //    getVoxelValue(voxels, x,y-1,z) &&
+                //    getVoxelValue(voxels, x,y+1,z) &&
+                //    getVoxelValue(voxels, x-1,y,z) && 
+                //    getVoxelValue(voxels, x+1,y,z)){
+                //     voxels.data[idx(x,y,z,voxels)] = true;
+                // }
+            }
+        }
+    }
+
+    std::cout << detectedGroups.size() << std::endl;
 }

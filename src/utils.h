@@ -17,6 +17,8 @@ bool isCubeBackground(int x, int y, int z, Voxels& voxels);
 
 int idx(int x, int y, int z, Voxels& voxels);
 
+bool getVoxelValue(Voxels& voxels, int x, int y, int z);
+
 bool rayAABBIntersection(const Ray& ray,
                          const AABB& box,
                          double& tstart,
@@ -35,3 +37,7 @@ Vec3 getBoundingBox(Voxels& voxels);
 Cylinder getCylinder(Voxels& voxels, Vec3& bbox);
 
 OutCylinder getOutCylinder(Voxels& voxels, Vec3& bbox);
+
+void removeSingleVoxels(Voxels& voxels);
+
+void createGroup(Voxels& voxels, int x, int y, int z, std::vector<VoxelArea>& groups);
