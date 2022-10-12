@@ -41,6 +41,11 @@ int main(int argc, char *argv[]){
            .default_value(false)
            .implicit_value(true);
 
+    args.add_argument("--filter")
+        .help("Delete small groups of voxels that could be not hit be removing ray")
+        .default_value(false)
+        .implicit_value(true);
+
     args.add_argument("path")
         .help("Path to images");
 
@@ -160,7 +165,9 @@ int main(int argc, char *argv[]){
 
     std::cout << "Removing small groups of voxels..." << std::endl;
 
-    removeSingleVoxels(voxels);
+    if(args.get<bool>("--filter")){
+        removeSingleVoxels(voxels);
+    }
 
     auto end = std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::system_clock::now().time_since_epoch()

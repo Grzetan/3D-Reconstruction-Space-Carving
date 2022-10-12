@@ -16,6 +16,7 @@ Implementation of space (voxel) carving written in C++.
     - [`--voxel_size`](#voxel_size)
     - [`--voxel_rl_size`](#voxel_rl_size)
     - [`--segmentation_thresh`](#thresh)
+    - [`--filter`](#filter)
 5. [Examples](#examples)
 6. [Tutorial on generating test datasets in blender](#blender)
 
@@ -134,6 +135,15 @@ Default value is `60`. Range: `<1, 255>`.
 Example:
 ```bash
 ./main path/to/images --segmentation_thresh 100
+```
+
+## `--filter` (Not required) <a name="filter"></a>
+
+Delete small groups of voxels that could be skipped during carving
+
+Example:
+```bash
+./main path/to/images --filter
 ```
 
 # Gallery <a name="gallery"></a>
