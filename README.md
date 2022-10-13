@@ -88,7 +88,7 @@ For now program supports only one vertical position. Maybe in future I will exte
 
 ## Path (Mandatory) <a name="path"></a>
 
-Path to folder with `.bmp` images. Number of images in folder can be random. Please note that names should be called `1.bmp`, `2.bmp`, `3.bmp` ..., otherwise program won't execute correctly.
+Path to folder with `.bmp` images. Number of images in folder can be random. Please note that names should be called `1.bmp`, `2.bmp`, `3.bmp` ..., otherwise program won't execute correctly. Images must be the same size. If number of images in folder is divisible by 4 program will automaticly adjust rotation axis. If not, rotation axis will be placed in the center of the grid (center of every image).
 ```bash
 ./main ./path/to/images
 ```

@@ -114,6 +114,42 @@ int main(int argc, char *argv[]){
 
     int W = sampleImg.get_width(), H = sampleImg.get_height();
 
+    // If possible, adjust rotation axis
+    int N_IMAGES = images.size();
+
+    if(N_IMAGES % 4 == 0){
+        std::cout << "Adjusting rotation axis..." << std::endl;
+        int degrees90Rotation = N_IMAGES / 4;
+        std::vector<std::array<int, 2>> objectHorizontalSize = {}; // Array for storing size of detected object in X axis
+
+        // For 4 images (0, 90, 180 and 270) calculate the size of image. This will be necessary to calculate rotation axis
+        for(int i=0; i<4; i++){
+            BMP img(images[i*degrees90Rotation]);
+            int min = W, max = 0;
+            for(int x=0; x<W; x++){
+                for(int y=0; y<H; y++){
+                    Pixel pixel = img.get_pixel(x, y);
+                    if(pixel.b > 0){
+                        min = std::min(min, x);
+                        max = std::max(max, x);
+                    }
+                }
+            }
+            objectHorizontalSize.push_back({min, max});
+        }
+
+        // Adjust position of rotation axis in X
+        double axisXPos = (double)(objectHorizontalSize[0][0] + (objectHorizontalSize[2][1] - objectHorizontalSize[0][0]) / 2) / W;
+        double axisZPos = (double)(objectHorizontalSize[1][0] + (objectHorizontalSize[3][1] - objectHorizontalSize[1][0]) / 2) / W;
+
+        std::cout << cameraPos.x << ", " << cameraPos.z << std::endl;
+        std::cout << axisXPos << ", " << axisZPos << std::endl;
+        cameraPos.x = voxels.VOXEL_SIZE * voxels.SCENE_SIZE * axisXPos;
+        cameraPos.z = voxels.VOXEL_SIZE * voxels.SCENE_SIZE * axisZPos;
+
+        std::cout << cameraPos.x << ", " << cameraPos.z << std::endl;
+    }
+
     // Angles of rays shot from each pixel
     double oneTickX = xFOV / (double) W;
     double oneTickY = yFOV / (double) H;
@@ -121,7 +157,6 @@ int main(int argc, char *argv[]){
     double startAngleY = -yFOV / 2.0;
     double angleX, angleY;
 
-    int N_IMAGES = images.size();
     double angle = 2*M_PI / N_IMAGES;
 
     std::cout << "Carving space..." << std::endl;
@@ -150,7 +185,7 @@ int main(int argc, char *argv[]){
                 Pixel pixel = img.get_pixel(x, y);
                 // Dont remove voxels for object pixels
                 // if(pixel.r > THRESH || pixel.g > THRESH || pixel.b > THRESH) continue;
-                if(pixel.b > 170) continue;
+                if(pixel.b > 0) continue;
 
                 angleX = (startAngleX + x * oneTickX);
                 angleY = (startAngleY + y * oneTickY);

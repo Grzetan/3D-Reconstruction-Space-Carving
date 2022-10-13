@@ -494,17 +494,7 @@ void removeSingleVoxels(Voxels& voxels){
 
                 createGroup(voxels, x,y,z, detectedGroups);
                 if(!detectedGroups[detectedGroups.size() - 1].isValid()) voxels.data[idx(x,y,z,voxels)] = true;
-                // if(getVoxelValue(voxels, x,y,z-1) && 
-                //    getVoxelValue(voxels, x,y,z+1) &&
-                //    getVoxelValue(voxels, x,y-1,z) &&
-                //    getVoxelValue(voxels, x,y+1,z) &&
-                //    getVoxelValue(voxels, x-1,y,z) && 
-                //    getVoxelValue(voxels, x+1,y,z)){
-                //     voxels.data[idx(x,y,z,voxels)] = true;
-                // }
             }
         }
     }
-
-    std::cout << detectedGroups.size() << std::endl;
 }
