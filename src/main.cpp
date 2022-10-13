@@ -46,6 +46,11 @@ int main(int argc, char *argv[]){
         .default_value(false)
         .implicit_value(true);
 
+    args.add_argument("--adjust_rotation")
+        .help("Automaticly adjust rotation axis based on images. Number of images in folder must be divisible by 4.")
+        .default_value(false)
+        .implicit_value(true);
+
     args.add_argument("path")
         .help("Path to images");
 
@@ -117,7 +122,7 @@ int main(int argc, char *argv[]){
     // If possible, adjust rotation axis
     int N_IMAGES = images.size();
 
-    if(N_IMAGES % 4 == 0){
+    if(N_IMAGES % 4 == 0 && args.get<bool>("--adjust_rotation")){
         std::cout << "Adjusting rotation axis..." << std::endl;
         int degrees90Rotation = N_IMAGES / 4;
         std::vector<std::array<int, 2>> objectHorizontalSize = {}; // Array for storing size of detected object in X axis
@@ -129,7 +134,7 @@ int main(int argc, char *argv[]){
             for(int x=0; x<W; x++){
                 for(int y=0; y<H; y++){
                     Pixel pixel = img.get_pixel(x, y);
-                    if(pixel.b > 0){
+                    if(pixel.b > 170 && pixel.g < 80 && pixel.r < 80){
                         min = std::min(min, x);
                         max = std::max(max, x);
                     }

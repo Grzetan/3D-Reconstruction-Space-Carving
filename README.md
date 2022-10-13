@@ -17,6 +17,7 @@ Implementation of space (voxel) carving written in C++.
     - [`--voxel_rl_size`](#voxel_rl_size)
     - [`--segmentation_thresh`](#thresh)
     - [`--filter`](#filter)
+    - [`--adjust_rotation`](#rotation)
 5. [Examples](#examples)
 6. [Tutorial on generating test datasets in blender](#blender)
 
@@ -88,7 +89,7 @@ For now program supports only one vertical position. Maybe in future I will exte
 
 ## Path (Mandatory) <a name="path"></a>
 
-Path to folder with `.bmp` images. Number of images in folder can be random. Please note that names should be called `1.bmp`, `2.bmp`, `3.bmp` ..., otherwise program won't execute correctly. Images must be the same size. If number of images in folder is divisible by 4 program will automaticly adjust rotation axis. If not, rotation axis will be placed in the center of the grid (center of every image).
+Path to folder with `.bmp` images. Number of images in folder can be random. Please note that names should be called `1.bmp`, `2.bmp`, `3.bmp` ..., otherwise program won't execute correctly. Images must be the same size. If number of images in folder is divisible by 4 and `--adjust_rotation` is active program will automaticly adjust rotation axis. If not, rotation axis will be placed in the center of the grid (center of every image).
 ```bash
 ./main ./path/to/images
 ```
@@ -144,6 +145,15 @@ Delete small groups of voxels that could be skipped during carving
 Example:
 ```bash
 ./main path/to/images --filter
+```
+
+## `--adjust_rotation` (Not required) <a name="rotation"></a>
+
+Automaticly adjust rotatation axis. Number of images in folder must be divisible by 4, otherwise this option will to nothing.
+
+Example:
+```bash
+./main path/to/images --adjust_rotation
 ```
 
 # Gallery <a name="gallery"></a>
