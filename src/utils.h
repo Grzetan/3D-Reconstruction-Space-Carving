@@ -5,6 +5,7 @@
 #include <vector>
 #include "types.h"
 #include "happly.h"
+#include "bmplib.h"
 #include <cmath>
 
 void generateVoxels(Voxels& voxels);
@@ -32,12 +33,16 @@ Vec3 rotateUsingQuaterion(Vec3& v, double angle, RotationType type);
 
 double degrees2radians(double degrees);
 
-Vec3 getBoundingBox(Voxels& voxels);
+Bbox getBoundingBox(Voxels& voxels);
 
-Cylinder getCylinder(Voxels& voxels, Vec3& bbox);
-
-OutCylinder getOutCylinder(Voxels& voxels, Vec3& bbox);
+Cylinder getCylinder(Voxels& voxels, const Bbox& bbox, const Vec3& cameraPos);
 
 void removeSingleVoxels(Voxels& voxels);
 
-void createGroup(Voxels& voxels, int x, int y, int z, std::vector<VoxelArea>& groups);
+void createGroupVoxels(Voxels& voxels, int x, int y, int z, std::vector<VoxelArea>& groups);
+
+void createGroupImage(BMP& image, int x, int y, std::vector<ImageArea>& groups);
+
+void segmentImage(BMP& image);
+
+bool isPixelBackground(Pixel& p);

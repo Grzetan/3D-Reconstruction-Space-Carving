@@ -18,6 +18,7 @@ Implementation of space (voxel) carving written in C++.
     - [`--segmentation_thresh`](#thresh)
     - [`--filter`](#filter)
     - [`--adjust_rotation`](#rotation)
+    - [`--save_segmented`](#save)
 5. [Examples](#examples)
 6. [Tutorial on generating test datasets in blender](#blender)
 
@@ -154,6 +155,15 @@ Automaticly adjust rotatation axis. Number of images in folder must be divisible
 Example:
 ```bash
 ./main path/to/images --adjust_rotation
+```
+
+## `--save_segmented` (Not required) <a name="save"></a>
+
+Save segmented images to output folder "segmented_images". This can be used to debug program.
+
+Example:
+```bash
+./main path/to/images --save_segmented
 ```
 
 # Gallery <a name="gallery"></a>

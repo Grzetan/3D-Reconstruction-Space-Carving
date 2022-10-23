@@ -51,6 +51,11 @@ int main(int argc, char *argv[]){
         .default_value(false)
         .implicit_value(true);
 
+    args.add_argument("--save_segmented")
+        .help("Save segmented images to output directory")
+        .default_value(false)
+        .implicit_value(true);
+
     args.add_argument("path")
         .help("Path to images");
 
@@ -130,11 +135,12 @@ int main(int argc, char *argv[]){
         // For 4 images (0, 90, 180 and 270) calculate the size of image. This will be necessary to calculate rotation axis
         for(int i=0; i<4; i++){
             BMP img(images[i*degrees90Rotation]);
+            segmentImage(img);
             int min = W, max = 0;
             for(int x=0; x<W; x++){
                 for(int y=0; y<H; y++){
                     Pixel pixel = img.get_pixel(x, y);
-                    if(pixel.b > 170 && pixel.g < 80 && pixel.r < 80){
+                    if(pixel.r == 0 && pixel.g == 0 && pixel.b == 0){
                         min = std::min(min, x);
                         max = std::max(max, x);
                     }
@@ -147,12 +153,8 @@ int main(int argc, char *argv[]){
         double axisXPos = (double)(objectHorizontalSize[0][0] + (objectHorizontalSize[2][1] - objectHorizontalSize[0][0]) / 2) / W;
         double axisZPos = (double)(objectHorizontalSize[1][0] + (objectHorizontalSize[3][1] - objectHorizontalSize[1][0]) / 2) / W;
 
-        std::cout << cameraPos.x << ", " << cameraPos.z << std::endl;
-        std::cout << axisXPos << ", " << axisZPos << std::endl;
         cameraPos.x = voxels.VOXEL_SIZE * voxels.SCENE_SIZE * axisXPos;
         cameraPos.z = voxels.VOXEL_SIZE * voxels.SCENE_SIZE * axisZPos;
-
-        std::cout << cameraPos.x << ", " << cameraPos.z << std::endl;
     }
 
     // Angles of rays shot from each pixel
@@ -172,11 +174,21 @@ int main(int argc, char *argv[]){
 
     const int THRESH = args.get<int>("--segmentation_thresh");
 
+    if(args.get<bool>("--save_segmented")){
+        std::filesystem::remove_all("segmented_images");
+        std::filesystem::create_directory("segmented_images");
+    }
+
     for(int i=0; i<N_IMAGES; i++){
         std::cout << "Image " << i << "/" << N_IMAGES << "\t\r" << std::flush;
         // Read current image
         BMP img(images[i]);
 
+        segmentImage(img);
+
+        if(args.get<bool>("--save_segmented")){
+            img.write("segmented_images/output" + std::to_string(i) + ".bmp");
+        }
         // Rotate camera direction and position
         Vec3 offset = cameraPos - gridCenter;
         rotateAroundZAxis(offset, angle);
@@ -189,8 +201,7 @@ int main(int argc, char *argv[]){
             for(int y=0; y<H; y++){
                 Pixel pixel = img.get_pixel(x, y);
                 // Dont remove voxels for object pixels
-                // if(pixel.r > THRESH || pixel.g > THRESH || pixel.b > THRESH) continue;
-                if(pixel.b > 0) continue;
+                if(pixel.r == 0 && pixel.g == 0 && pixel.b == 0) continue;
 
                 angleX = (startAngleX + x * oneTickX);
                 angleY = (startAngleY + y * oneTickY);
@@ -203,9 +214,8 @@ int main(int argc, char *argv[]){
         }
     }
 
-    std::cout << "Removing small groups of voxels..." << std::endl;
-
     if(args.get<bool>("--filter")){
+        std::cout << "Removing small groups of voxels..." << std::endl;
         removeSingleVoxels(voxels);
     }
 
@@ -217,10 +227,11 @@ int main(int argc, char *argv[]){
 
     std::cout << std::endl << "Carving took: " << time_ << ". Average time per image: " << time_ / N_IMAGES << std::endl;
 
-    Vec3 bbox = getBoundingBox(voxels);
-    std::cout << "Bounding box: (x: " << bbox.x << "mm, y: " << bbox.y << "mm, z: " << bbox.z << "mm)" << std::endl;
+    Bbox bbox = getBoundingBox(voxels);
+    std::cout << "Bounding box: (x: " << bbox.min.x << "mm, y: " << bbox.min.y << "mm, z: " << bbox.min.z << "mm)" << std::endl;
+    std::cout << "Bounding box: (x: " << bbox.max.x << "mm, y: " << bbox.max.y << "mm, z: " << bbox.max.z << "mm)" << std::endl;
 
-    Cylinder cylinder = getCylinder(voxels, bbox);
+    Cylinder cylinder = getCylinder(voxels, bbox, cameraPos);
     std::cout << "Cylinder: radius = " << cylinder.r << ", height = " << cylinder.h << ", center = (" << cylinder.center.x << ", " << cylinder.center.y << ", " << cylinder.center.z << ")" << std::endl;
 
     std::cout << "Rendering carved space..." << std::endl;

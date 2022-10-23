@@ -156,8 +156,8 @@ struct BMP {
         }
     }
 
-    void write(const char *fname) {
-        std::ofstream of{ fname, std::ios_base::binary };
+    void write(std::string fname) {
+        std::ofstream of{ fname.c_str(), std::ios_base::binary };
         if (of) {
             if (bmp_info_header.bit_count == 32) {
                 write_headers_and_data(of);

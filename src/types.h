@@ -76,6 +76,15 @@ struct VoxelArea{
     }
 };
 
+struct ImageArea{
+    std::array<int, 2> start;
+    std::array<int, 2> end;
+
+    bool isValid(int minGroupSize = 50){
+        return end[0] - start[0] > minGroupSize || end[1] - start[1] > minGroupSize;
+    }
+};
+
 typedef std::vector<std::array<double, 3>> Vertices;
 typedef std::vector<std::vector<size_t>> Faces;
 
@@ -188,9 +197,9 @@ struct Cylinder{
     Vec3 center;
 };
 
-struct OutCylinder{
-    double radius;
-    double height;
+struct Bbox{
+    Vec3 min;
+    Vec3 max;
 };
 
 // Relative coordinates of middle point on given edge

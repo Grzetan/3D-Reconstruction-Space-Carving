@@ -354,9 +354,9 @@ Vec3 rotateUsingQuaterion(Vec3& v, double angle, RotationType type){
     return {newP.b, newP.c, newP.d};
 }
 
-Vec3 getBoundingBox(Voxels& voxels){
+Bbox getBoundingBox(Voxels& voxels){
     int x,y,z;
-    int minX=voxels.SCENE_SIZE, maxX=0, minY=voxels.SCENE_SIZE, maxY=0, minZ=voxels.SCENE_SIZE, maxZ=0;
+    double minX=voxels.SCENE_SIZE, maxX=0, minY=voxels.SCENE_SIZE, maxY=0, minZ=voxels.SCENE_SIZE, maxZ=0;
 
     for(x=0; x<voxels.SCENE_SIZE; x++){
         for(y=0; y<voxels.SCENE_SIZE; y++){
@@ -376,13 +376,12 @@ Vec3 getBoundingBox(Voxels& voxels){
     }
 
     return {
-        (maxX - minX) * voxels.VOXEL_RL_SIZE,
-        (maxY - minY) * voxels.VOXEL_RL_SIZE,
-        (maxZ - minZ) * voxels.VOXEL_RL_SIZE
+        {minX, minY, minZ},
+        {maxX+1, maxY+1, maxZ+1}
     };
 }
 
-Cylinder getCylinder(Voxels& voxels, Vec3& bbox){
+Cylinder getCylinder(Voxels& voxels, const Bbox& bbox, const Vec3& cameraPos){
     double maxDist = 0;
     
     int x,y,z;
@@ -391,39 +390,19 @@ Cylinder getCylinder(Voxels& voxels, Vec3& bbox){
             for(z=0; z<voxels.SCENE_SIZE; z++){
                 if(voxels.data[idx(x,y,z,voxels)]) continue;
 
-                double distX = (x - voxels.SCENE_SIZE / 2) * voxels.VOXEL_RL_SIZE;
-                double distY = (y - voxels.SCENE_SIZE / 2) * voxels.VOXEL_RL_SIZE;
+                double distX = (x * voxels.VOXEL_SIZE - cameraPos.x) * voxels.VOXEL_RL_SIZE;
+                double distY = (z * voxels.VOXEL_SIZE - cameraPos.z) * voxels.VOXEL_RL_SIZE;
                 double dist = sqrt(distX*distX + distY*distY);
                 if(dist > maxDist) maxDist = dist;
             }
         }
     }
 
-    return {maxDist, bbox.z, {voxels.SCENE_SIZE / 2 * voxels.VOXEL_RL_SIZE, voxels.SCENE_SIZE / 2 * voxels.VOXEL_RL_SIZE, 0}};
-}
-
-OutCylinder getOutCylinder(Voxels& voxels, Vec3& bbox){
-    double maxDist = 0;
-    
-    int x,y,z;
-    for(x=0; x<voxels.SCENE_SIZE; x++){
-        for(y=0; y<voxels.SCENE_SIZE; y++){
-            for(z=0; z<voxels.SCENE_SIZE; z++){
-                if(voxels.data[idx(x,y,z,voxels)]) continue;
-
-                double distX = (x - voxels.SCENE_SIZE / 2) * voxels.VOXEL_RL_SIZE;
-                double distY = (y - voxels.SCENE_SIZE / 2) * voxels.VOXEL_RL_SIZE;
-                double dist = sqrt(distX*distX + distY*distY);
-                if(dist > maxDist) maxDist = dist;
-            }
-        }
-    }
-
-    return {maxDist, bbox.z};
+    return {maxDist, bbox.max.y - bbox.min.y, {cameraPos.x / voxels.VOXEL_SIZE * voxels.VOXEL_RL_SIZE, bbox.min.y, cameraPos.z / voxels.VOXEL_SIZE * voxels.VOXEL_RL_SIZE}};
 }
 
 // Create voxel group
-void createGroup(Voxels& voxels, int x, int y, int z, std::vector<VoxelArea>& groups){
+void createGroupVoxels(Voxels& voxels, int x, int y, int z, std::vector<VoxelArea>& groups){
     VoxelArea area{{x,y,z}, {x+1, y+1, z+1}};
 
     int i,j;
@@ -468,6 +447,42 @@ void createGroup(Voxels& voxels, int x, int y, int z, std::vector<VoxelArea>& gr
     groups.push_back(area);
 }
 
+void createGroupImage(BMP& image, int x, int y, std::vector<ImageArea>& groups){
+    ImageArea area{{x,y}, {x+1, y+1}};
+
+    int i;
+    bool expandedX = true, expandedY = true;
+
+    while(expandedX || expandedY){
+        expandedX = false;
+        expandedY = false;
+
+        // Check if there are any object pixels to the right
+        for(i=area.start[1]; i<=area.end[1]; i++){
+            if(area.end[0] >= image.get_width() || i >= image.get_height()) break;
+
+            Pixel p = image.get_pixel(area.end[0], i);
+            if(!isPixelBackground(p)){
+                area.end[0]++;
+                expandedX = true;
+            }
+        }
+
+        // Check if there are any object pixels at the bottom
+        for(i=area.start[0]; i<=area.end[0]; i++){
+            if(i >= image.get_width() || area.end[1] >= image.get_height()) break;
+
+            Pixel p = image.get_pixel(i,area.end[1]);
+            if(!isPixelBackground(p)){
+                area.end[1]++;
+                expandedY = true;
+            }
+        }
+    }
+
+    groups.push_back(area);
+}
+
 // Remove voxels small groups of voxels so they don't ruin "out cylinder"
 void removeSingleVoxels(Voxels& voxels){
     int x,y,z;
@@ -492,9 +507,50 @@ void removeSingleVoxels(Voxels& voxels){
                 if(isInGroup) continue;
                 
 
-                createGroup(voxels, x,y,z, detectedGroups);
+                createGroupVoxels(voxels, x,y,z, detectedGroups);
                 if(!detectedGroups[detectedGroups.size() - 1].isValid()) voxels.data[idx(x,y,z,voxels)] = true;
             }
         }
     }
+}
+
+// WHITE = background
+// BLACK = object
+void segmentImage(BMP& image){
+    int x, y;
+    std::vector<ImageArea> detectedGroups = {};
+
+    for(x=0; x<image.get_width(); x++){
+        for(y=0; y<image.get_height(); y++){
+            Pixel pixel = image.get_pixel(x, y);
+            // If background, change color and skip
+            if(isPixelBackground(pixel)){
+                image.set_pixel(x, y, 255, 255, 255, 255);
+                continue;
+            }
+
+            // If pixel is already in group, skip
+            bool isInGroup = false;
+            for(auto& group : detectedGroups){
+                if(x >= group.start[0] && y >= group.start[1] && x <= group.end[0] && y <= group.end[1]){
+                    // If group is not valid, change color to background (white), if valid change to object (black)
+                    if(!group.isValid()){
+                        image.set_pixel(x, y, 255, 255, 255, 255);
+                    }else{
+                        image.set_pixel(x, y, 0, 0, 0, 255);
+                    }
+                    isInGroup = true;
+                    break;
+                }
+            }
+            if(isInGroup) continue;
+
+            createGroupImage(image, x, y, detectedGroups);
+            if(!detectedGroups[detectedGroups.size() - 1].isValid()) image.set_pixel(x, y, 255, 255, 255, 255);
+        }
+    }
+}
+
+bool isPixelBackground(Pixel& p){
+    return p.g > p.r && p.g > p.b && p.g > 100 && p.g - p.r > 10 && p.g - p.b > 10;
 }
