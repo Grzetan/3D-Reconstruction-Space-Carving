@@ -127,6 +127,8 @@ int main(int argc, char *argv[]){
     // If possible, adjust rotation axis
     int N_IMAGES = images.size();
 
+    int VERTICAL_MARGIN = 200; // Margin on the top and bottom (This allows to adjust axis even if rotary table is visible)
+
     if(N_IMAGES % 4 == 0 && args.get<bool>("--adjust_rotation")){
         std::cout << "Adjusting rotation axis..." << std::endl;
         int degrees90Rotation = N_IMAGES / 4;
@@ -138,7 +140,7 @@ int main(int argc, char *argv[]){
             segmentImage(img);
             int min = W, max = 0;
             for(int x=0; x<W; x++){
-                for(int y=0; y<H; y++){
+                for(int y=VERTICAL_MARGIN; y<H; y++){
                     Pixel pixel = img.get_pixel(x, y);
                     if(pixel.r == 0 && pixel.g == 0 && pixel.b == 0){
                         min = std::min(min, x);
@@ -152,6 +154,8 @@ int main(int argc, char *argv[]){
         // Adjust position of rotation axis in X
         double axisXPos = (double)(objectHorizontalSize[0][0] + (objectHorizontalSize[2][1] - objectHorizontalSize[0][0]) / 2) / W;
         double axisZPos = (double)(objectHorizontalSize[1][0] + (objectHorizontalSize[3][1] - objectHorizontalSize[1][0]) / 2) / W;
+
+        std::cout << axisXPos << ", " << axisZPos << std::endl;
 
         cameraPos.x = voxels.VOXEL_SIZE * voxels.SCENE_SIZE * axisXPos;
         cameraPos.z = voxels.VOXEL_SIZE * voxels.SCENE_SIZE * axisZPos;

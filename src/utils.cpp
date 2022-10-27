@@ -528,7 +528,8 @@ void segmentImage(BMP& image){
                 image.set_pixel(x, y, 255, 255, 255, 255);
                 continue;
             }
-
+            // image.set_pixel(x, y, 0,0,0, 255);
+            // continue;
             // If pixel is already in group, skip
             bool isInGroup = false;
             for(auto& group : detectedGroups){
@@ -552,5 +553,5 @@ void segmentImage(BMP& image){
 }
 
 bool isPixelBackground(Pixel& p){
-    return p.g > p.r && p.g > p.b && p.g > 100 && p.g - p.r > 10 && p.g - p.b > 10;
+    return p.g > p.r && p.g > p.b && p.g > 80 && p.g - p.r > 5 && p.g - p.b > 5;
 }
