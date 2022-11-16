@@ -552,6 +552,20 @@ void segmentImage(BMP& image){
     }
 }
 
+void removeGate(Voxels& voxels, std::vector<std::array<int, 6>>& areasToRemove){    
+    for(auto& area : areasToRemove){
+        // Remove every voxel in area
+        for(int x=area[0]; x<area[3]; x++){
+            for(int y=area[1]; y<area[4]; y++){
+                for(int z=area[2]; z<area[5]; z++){
+                    voxels.data[idx(x,y,z,voxels)] = true;
+                }
+            }
+        }
+    }
+}
+
 bool isPixelBackground(Pixel& p){
-    return p.g > p.r && p.g > p.b && p.g > 80 && p.g - p.r > 5 && p.g - p.b > 5;
+    // return p.g > p.r && p.g > p.b && p.g > 100 && p.g - p.r > 20 && p.g - p.b > 20;
+    return (p.r == -1 && p.g == -1 && p.b == -1);
 }

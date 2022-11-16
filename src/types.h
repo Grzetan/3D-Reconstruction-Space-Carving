@@ -71,7 +71,7 @@ struct VoxelArea{
     Vec3Int start;
     Vec3Int end;
 
-    bool isValid(int minGroupSize = 10){
+    bool isValid(int minGroupSize = 30){
         return end.x - start.x > minGroupSize || end.y - start.y > minGroupSize || end.z - start.z > minGroupSize;
     }
 };
@@ -101,7 +101,7 @@ typedef std::map<CubeFaces, bool>::iterator FaceVisMapIterator;
 
 typedef std::tuple<double, double, double> Key;
 typedef std::map<Key, int> UniqueVertices;
-typedef std::tuple<int, int, int> FaceKey;
+typedef std::tuple<int, int, int> FaceKey; 
 
 const FaceKey LEFT_FACE = {-1, 0, 0};
 const FaceKey RIGHT_FACE = {1, 0, 0};

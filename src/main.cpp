@@ -56,6 +56,11 @@ int main(int argc, char *argv[]){
         .default_value(false)
         .implicit_value(true);
 
+    args.add_argument("--remove_gate")
+        .help("Remove gate from output image")
+        .default_value(false)
+        .implicit_value(true);
+
     args.add_argument("path")
         .help("Path to images");
 
@@ -83,7 +88,7 @@ int main(int argc, char *argv[]){
     Vec3 gridCenter(voxels.VOXEL_SIZE * voxels.SCENE_SIZE / 2, voxels.VOXEL_SIZE * voxels.SCENE_SIZE / 2, voxels.VOXEL_SIZE * voxels.SCENE_SIZE / 2);
 
     // Camera parameters
-    double xFOV = 46.7;
+    double xFOV = 55.7;
     double yFOV = 46.7;
     xFOV = degrees2radians(xFOV);
     yFOV = degrees2radians(yFOV);
@@ -230,6 +235,13 @@ int main(int argc, char *argv[]){
     auto time_ = end.count() - start.count();
 
     std::cout << std::endl << "Carving took: " << time_ << ". Average time per image: " << time_ / N_IMAGES << std::endl;
+
+    // Remove gate
+    if(args.get<bool>("--remove_gate")){
+        // Vector of areas to remove (x1,y1,x2,y2)
+        std::vector<std::array<int, 6>> areasToRemove = { {0,0,0,10,10,10}, {0,30,30,40,40,40} };
+        removeGate(voxels, areasToRemove);
+    }
 
     Bbox bbox = getBoundingBox(voxels);
     std::cout << "Bounding box: (x: " << bbox.min.x << "mm, y: " << bbox.min.y << "mm, z: " << bbox.min.z << "mm)" << std::endl;

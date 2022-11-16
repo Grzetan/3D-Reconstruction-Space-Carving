@@ -45,4 +45,6 @@ void createGroupImage(BMP& image, int x, int y, std::vector<ImageArea>& groups);
 
 void segmentImage(BMP& image);
 
+void removeGate(Voxels& voxels, std::vector<std::array<int, 6>>& areasToRemove);
+
 bool isPixelBackground(Pixel& p);
