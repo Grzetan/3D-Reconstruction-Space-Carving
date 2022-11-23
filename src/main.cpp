@@ -80,8 +80,10 @@ int main(int argc, char *argv[]){
 
     AABB box({0,0,0}, {voxels.VOXEL_SIZE*voxels.SCENE_SIZE, voxels.VOXEL_SIZE*voxels.SCENE_SIZE, voxels.VOXEL_SIZE*voxels.SCENE_SIZE});
 
+    constexpr double CAMERA_DIST = 0.9;
+
     // Camera position and rotation in real world relative to center of turn table
-    Vec3 cameraPos(voxels.VOXEL_SIZE * voxels.SCENE_SIZE / 2, -0.9*voxels.SCENE_SIZE*voxels.VOXEL_SIZE, voxels.VOXEL_SIZE * voxels.SCENE_SIZE / 2);
+    Vec3 cameraPos(voxels.VOXEL_SIZE * voxels.SCENE_SIZE / 2, (-CAMERA_DIST)*voxels.SCENE_SIZE*voxels.VOXEL_SIZE, voxels.VOXEL_SIZE * voxels.SCENE_SIZE / 2);
     Vec3 cameraDir(0, 1, 0);
 
     // Voxel grid center
@@ -90,6 +92,8 @@ int main(int argc, char *argv[]){
     // Camera parameters
     double xFOV = 55.7;
     double yFOV = 46.7;
+    // double xFOV = 60;
+    // double yFOV = 60;
     xFOV = degrees2radians(xFOV);
     yFOV = degrees2radians(yFOV);
 
@@ -239,7 +243,7 @@ int main(int argc, char *argv[]){
     // Remove gate
     if(args.get<bool>("--remove_gate")){
         // Vector of areas to remove (x1,y1,x2,y2)
-        std::vector<std::array<int, 6>> areasToRemove = { {0,0,0,10,10,10}, {0,30,30,40,40,40} };
+        std::vector<std::array<int, 6>> areasToRemove = { {60,60,60,90,90,200}, {70,70,170, 200,200,190}, {70,70,60, 200,200,70}, {120,120,60, 150,150,200} };
         removeGate(voxels, areasToRemove);
     }
 

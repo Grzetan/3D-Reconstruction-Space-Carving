@@ -524,7 +524,7 @@ void segmentImage(BMP& image){
         for(y=0; y<image.get_height(); y++){
             Pixel pixel = image.get_pixel(x, y);
             // If background, change color and skip
-            if(isPixelBackground(pixel)){
+            if(isPixelBackground(pixel) || x > 520 || y < 100){
                 image.set_pixel(x, y, 255, 255, 255, 255);
                 continue;
             }
@@ -566,6 +566,6 @@ void removeGate(Voxels& voxels, std::vector<std::array<int, 6>>& areasToRemove){
 }
 
 bool isPixelBackground(Pixel& p){
-    // return p.g > p.r && p.g > p.b && p.g > 100 && p.g - p.r > 20 && p.g - p.b > 20;
-    return (p.r == -1 && p.g == -1 && p.b == -1);
+    return p.g > p.r && p.g > p.b && p.g > 100 && p.g - p.r > 35 && p.g - p.b > 35;
+    // return (p.r < 30 && p.g < 30 && p.b < 30);
 }
