@@ -71,7 +71,7 @@ struct VoxelArea{
     Vec3Int start;
     Vec3Int end;
 
-    bool isValid(int minGroupSize = 10){
+    bool isValid(int minGroupSize = 7){
         return end.x - start.x > minGroupSize || end.y - start.y > minGroupSize || end.z - start.z > minGroupSize;
     }
 };

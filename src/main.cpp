@@ -131,6 +131,9 @@ int main(int argc, char *argv[]){
     // Read sample image to get width and height
     BMP sampleImg(images[0]);
 
+    // Calculate RL voxel size from first image
+    calibrateVoxels(sampleImg, voxels);
+
     int W = sampleImg.get_width(), H = sampleImg.get_height();
 
     // If possible, adjust rotation axis
@@ -203,11 +206,14 @@ int main(int argc, char *argv[]){
             img.write("segmented_images/output" + std::to_string(i) + ".bmp");
         }
         // Rotate camera direction and position
-        Vec3 offset = cameraPos - gridCenter;
-        rotateAroundZAxis(offset, angle);
-        cameraPos = offset + gridCenter;
+        if(i){
+            Vec3 offset = cameraPos - gridCenter;
+            rotateAroundZAxis(offset, angle);
+            cameraPos = offset + gridCenter;
 
-        rotateAroundZAxis(cameraDir, angle);
+            rotateAroundZAxis(cameraDir, angle);
+        }
+
 
         // For every pixel calculate it's direction and travere grid
         for(int x=0; x<W; x++){
@@ -219,7 +225,7 @@ int main(int argc, char *argv[]){
                 angleX = (startAngleX + x * oneTickX);
                 angleY = (startAngleY + y * oneTickY);
                 Vec3 pixelDir = rotateUsingQuaterion(cameraDir, angleY, RotationType::UP_DOWN);
-                pixelDir = rotateUsingQuaterion(pixelDir, angleX, RotationType::LEFT_RIGHT);
+                pixelDir = rotateUsingQuaterion(pixelDir, angleX, RotationType::LEFT_RIGHT);   
                 Ray r(pixelDir, cameraPos);
 
                 rayGridTraversal(r, voxels, box);
@@ -243,7 +249,7 @@ int main(int argc, char *argv[]){
     // Remove gate
     if(args.get<bool>("--remove_gate")){
         // Vector of areas to remove (x1,y1,x2,y2)
-        std::vector<std::array<int, 6>> areasToRemove = { {60,60,60,90,90,200}, {70,70,170, 200,200,190}, {70,70,60, 200,200,70}, {120,120,60, 150,150,200} };
+        std::vector<std::array<int, 6>> areasToRemove = { {50,80,60, 75,120,200}, {70,70,170, 200,200,190}, {130,80,60, 200,120,200}, {60,90,60, 150,120,100} };
         removeGate(voxels, areasToRemove);
     }
 

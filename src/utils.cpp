@@ -565,6 +565,23 @@ void removeGate(Voxels& voxels, std::vector<std::array<int, 6>>& areasToRemove){
     }
 }
 
+void calibrateVoxels(BMP& img, Voxels& voxels){
+    int yOffset = 100;
+    int min=img.get_width(), max=0;
+
+    for(int x=0; x<img.get_width(); x++){
+        Pixel pixel = img.get_pixel(x, yOffset);
+        if(!isPixelBackground(pixel)){
+            min = (x < min) ? x : min;
+            max = (x > max) ? x : max;
+        }
+    }
+    if(min == max) std::runtime_error("Cannot detect frame");
+
+    std::cout << max - min << std::endl;
+
+}
+
 bool isPixelBackground(Pixel& p){
     return p.g > p.r && p.g > p.b && p.g > 100 && p.g - p.r > 35 && p.g - p.b > 35;
     // return (p.r < 30 && p.g < 30 && p.b < 30);

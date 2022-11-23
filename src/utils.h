@@ -48,3 +48,5 @@ void segmentImage(BMP& image);
 void removeGate(Voxels& voxels, std::vector<std::array<int, 6>>& areasToRemove);
 
 bool isPixelBackground(Pixel& p);
+
+void calibrateVoxels(BMP& img, Voxels& voxels);
