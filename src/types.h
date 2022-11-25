@@ -48,6 +48,14 @@ public:
         y /= length;
         z /= length;
     }
+
+    double dist(Vec3& b){
+        return std::sqrt(std::pow(b.x - x, 2) + std::pow(b.y - y, 2) + std::pow(b.z - z, 2));
+    }
+
+    void print(){
+        std::cout << x << ", " << y << ", " << z << std::endl;
+    }
 };
 
 struct Voxels{

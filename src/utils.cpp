@@ -381,24 +381,27 @@ Bbox getBoundingBox(Voxels& voxels){
     };
 }
 
-Cylinder getCylinder(Voxels& voxels, const Bbox& bbox, const Vec3& cameraPos){
+Cylinder getCylinder(Voxels& voxels, const Bbox& bbox, const double axisXPos, const double axisZPos){
     double maxDist = 0;
     
+    double axisX = (axisXPos * voxels.SCENE_SIZE);
+    double axisZ = (axisZPos * voxels.SCENE_SIZE);
+
     int x,y,z;
     for(x=0; x<voxels.SCENE_SIZE; x++){
         for(y=0; y<voxels.SCENE_SIZE; y++){
             for(z=0; z<voxels.SCENE_SIZE; z++){
                 if(voxels.data[idx(x,y,z,voxels)]) continue;
 
-                double distX = (x * voxels.VOXEL_SIZE - cameraPos.x) * voxels.VOXEL_RL_SIZE;
-                double distY = (z * voxels.VOXEL_SIZE - cameraPos.z) * voxels.VOXEL_RL_SIZE;
+                double distX = (x * voxels.VOXEL_SIZE - axisX) * voxels.VOXEL_RL_SIZE;
+                double distY = (z * voxels.VOXEL_SIZE - axisZ) * voxels.VOXEL_RL_SIZE;
                 double dist = sqrt(distX*distX + distY*distY);
                 if(dist > maxDist) maxDist = dist;
             }
         }
     }
 
-    return {maxDist, bbox.max.y - bbox.min.y, {cameraPos.x / voxels.VOXEL_SIZE * voxels.VOXEL_RL_SIZE, bbox.min.y, cameraPos.z / voxels.VOXEL_SIZE * voxels.VOXEL_RL_SIZE}};
+    return {maxDist / voxels.VOXEL_SIZE * voxels.VOXEL_RL_SIZE, (bbox.max.z - bbox.min.z) * voxels.VOXEL_RL_SIZE, {0 / voxels.VOXEL_SIZE * voxels.VOXEL_RL_SIZE, bbox.min.y, 0 / voxels.VOXEL_SIZE * voxels.VOXEL_RL_SIZE}};
 }
 
 // Create voxel group
@@ -565,21 +568,37 @@ void removeGate(Voxels& voxels, std::vector<std::array<int, 6>>& areasToRemove){
     }
 }
 
-void calibrateVoxels(BMP& img, Voxels& voxels){
-    int yOffset = 100;
+void calibrateVoxels(BMP& img, Voxels& voxels, Vec3& cameraPos, Vec3& gridCenter, double oneTick, double startAngle){
+    int yOffset = 390;
     int min=img.get_width(), max=0;
 
     for(int x=0; x<img.get_width(); x++){
         Pixel pixel = img.get_pixel(x, yOffset);
-        if(!isPixelBackground(pixel)){
+        if(pixel.r == 0 && pixel.g == 0 && pixel.b == 0){
             min = (x < min) ? x : min;
             max = (x > max) ? x : max;
         }
     }
     if(min == max) std::runtime_error("Cannot detect frame");
 
-    std::cout << max - min << std::endl;
+    double angleMin = (startAngle + min * oneTick);
+    double angleMax = (startAngle + max * oneTick);
 
+    Vec3 minDir = {0,1,0};
+    Vec3 maxDir = {0,1,0};
+
+    rotateAroundZAxis(minDir, angleMin);   
+    rotateAroundZAxis(maxDir, angleMax);   
+
+    // std::cout << minDir.x << ", " << minDir.y << ", " << minDir.z << std::endl;
+    // std::cout << maxDir.x << ", " << maxDir.y << ", " << maxDir.z << std::endl;
+
+    minDir = minDir * cameraPos.dist(gridCenter);
+    maxDir = maxDir * cameraPos.dist(gridCenter);
+    double distBetween = minDir.dist(maxDir);
+    double voxelsInside = distBetween / voxels.VOXEL_SIZE;
+    double voxelRLSize = 28.0 / voxelsInside;
+    voxels.VOXEL_RL_SIZE = voxelRLSize;
 }
 
 bool isPixelBackground(Pixel& p){

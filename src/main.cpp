@@ -131,15 +131,14 @@ int main(int argc, char *argv[]){
     // Read sample image to get width and height
     BMP sampleImg(images[0]);
 
-    // Calculate RL voxel size from first image
-    calibrateVoxels(sampleImg, voxels);
-
     int W = sampleImg.get_width(), H = sampleImg.get_height();
 
     // If possible, adjust rotation axis
     int N_IMAGES = images.size();
 
     int VERTICAL_MARGIN = 200; // Margin on the top and bottom (This allows to adjust axis even if rotary table is visible)
+
+    double axisXPos, axisZPos;
 
     if(N_IMAGES % 4 == 0 && args.get<bool>("--adjust_rotation")){
         std::cout << "Adjusting rotation axis..." << std::endl;
@@ -164,8 +163,8 @@ int main(int argc, char *argv[]){
         }
 
         // Adjust position of rotation axis in X
-        double axisXPos = (double)(objectHorizontalSize[0][0] + (objectHorizontalSize[2][1] - objectHorizontalSize[0][0]) / 2) / W;
-        double axisZPos = (double)(objectHorizontalSize[1][0] + (objectHorizontalSize[3][1] - objectHorizontalSize[1][0]) / 2) / W;
+        axisXPos = (double)(objectHorizontalSize[0][0] + (objectHorizontalSize[2][1] - objectHorizontalSize[0][0]) / 2) / W;
+        axisZPos = (double)(objectHorizontalSize[1][0] + (objectHorizontalSize[3][1] - objectHorizontalSize[1][0]) / 2) / W;
 
         std::cout << axisXPos << ", " << axisZPos << std::endl;
 
@@ -181,6 +180,11 @@ int main(int argc, char *argv[]){
     double angleX, angleY;
 
     double angle = 2*M_PI / N_IMAGES;
+
+    
+    // Calculate RL voxel size from first image
+    segmentImage(sampleImg);
+    calibrateVoxels(sampleImg, voxels, cameraPos, gridCenter, oneTickX, startAngleX);
 
     std::cout << "Carving space..." << std::endl;
 
@@ -249,15 +253,14 @@ int main(int argc, char *argv[]){
     // Remove gate
     if(args.get<bool>("--remove_gate")){
         // Vector of areas to remove (x1,y1,x2,y2)
-        std::vector<std::array<int, 6>> areasToRemove = { {50,80,60, 75,120,200}, {70,70,170, 200,200,190}, {130,80,60, 200,120,200}, {60,90,60, 150,120,100} };
+        std::vector<std::array<int, 6>> areasToRemove = { {50,80,60, 85,120,200}, {70,70,160, 200,200,190}, {130,80,60, 200,120,200}, {60,90,60, 150,120,100} };
         removeGate(voxels, areasToRemove);
     }
 
     Bbox bbox = getBoundingBox(voxels);
-    std::cout << "Bounding box: (x: " << bbox.min.x << "mm, y: " << bbox.min.y << "mm, z: " << bbox.min.z << "mm)" << std::endl;
-    std::cout << "Bounding box: (x: " << bbox.max.x << "mm, y: " << bbox.max.y << "mm, z: " << bbox.max.z << "mm)" << std::endl;
+    std::cout << "Bounding box: (width: " << (bbox.max.x - bbox.min.x) * voxels.VOXEL_RL_SIZE << "cm, height: " << (bbox.max.z - bbox.min.z) * voxels.VOXEL_RL_SIZE << "cm, depth: " << (bbox.max.y - bbox.min.y) * voxels.VOXEL_RL_SIZE << "cm)" << std::endl;
 
-    Cylinder cylinder = getCylinder(voxels, bbox, cameraPos);
+    Cylinder cylinder = getCylinder(voxels, bbox, axisXPos, axisZPos);
     std::cout << "Cylinder: radius = " << cylinder.r << ", height = " << cylinder.h << ", center = (" << cylinder.center.x << ", " << cylinder.center.y << ", " << cylinder.center.z << ")" << std::endl;
 
     std::cout << "Rendering carved space..." << std::endl;

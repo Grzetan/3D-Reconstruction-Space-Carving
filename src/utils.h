@@ -35,7 +35,7 @@ double degrees2radians(double degrees);
 
 Bbox getBoundingBox(Voxels& voxels);
 
-Cylinder getCylinder(Voxels& voxels, const Bbox& bbox, const Vec3& cameraPos);
+Cylinder getCylinder(Voxels& voxels, const Bbox& bbox, const double axisXPos, const double axisZPos);
 
 void removeSingleVoxels(Voxels& voxels);
 
@@ -49,4 +49,4 @@ void removeGate(Voxels& voxels, std::vector<std::array<int, 6>>& areasToRemove);
 
 bool isPixelBackground(Pixel& p);
 
-void calibrateVoxels(BMP& img, Voxels& voxels);
+void calibrateVoxels(BMP& img, Voxels& voxels, Vec3& cameraPos, Vec3& gridCenter, double oneTick, double startAngle);
