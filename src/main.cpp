@@ -261,7 +261,7 @@ int main(int argc, char *argv[]){
     std::cout << "Bounding box: (width: " << (bbox.max.x - bbox.min.x) * voxels.VOXEL_RL_SIZE << "cm, height: " << (bbox.max.z - bbox.min.z) * voxels.VOXEL_RL_SIZE << "cm, depth: " << (bbox.max.y - bbox.min.y) * voxels.VOXEL_RL_SIZE << "cm)" << std::endl;
 
     Cylinder cylinder = getCylinder(voxels, bbox, axisXPos, axisZPos);
-    std::cout << "Cylinder: radius = " << cylinder.r << ", height = " << cylinder.h << ", center = (" << cylinder.center.x << ", " << cylinder.center.y << ", " << cylinder.center.z << ")" << std::endl;
+    std::cout << "Cylinder: radius = " << cylinder.r << "cm, height = " << cylinder.h << "cm, center = (" << cylinder.center.x << ", " << cylinder.center.y << ", " << cylinder.center.z << ")" << std::endl;
 
     std::cout << "Rendering carved space..." << std::endl;
 
