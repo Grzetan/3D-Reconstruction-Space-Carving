@@ -594,8 +594,8 @@ void calibrateVoxels(BMP& img, Voxels& voxels, Vec3& cameraPos, Vec3& gridCenter
     Vec3 minDir = {0,1,0};
     Vec3 maxDir = {0,1,0};
 
-    rotateAroundZAxis(minDir, angleMin);   
-    rotateAroundZAxis(maxDir, angleMax);   
+    rotateAroundZAxis(minDir, angleMin);
+    rotateAroundZAxis(maxDir, angleMax);
 
     // std::cout << minDir.x << ", " << minDir.y << ", " << minDir.z << std::endl;
     // std::cout << maxDir.x << ", " << maxDir.y << ", " << maxDir.z << std::endl;
@@ -609,6 +609,6 @@ void calibrateVoxels(BMP& img, Voxels& voxels, Vec3& cameraPos, Vec3& gridCenter
 }
 
 bool isPixelBackground(Pixel& p){
-    return p.g > p.r && p.g > p.b && p.g > 100 && p.g - p.r > 35 && p.g - p.b > 35;
+    return (p.g > p.r && p.g > p.b && p.g > 100 && p.g - p.r > 30 && p.g - p.b > 30) || (p.r < 30 && p.g < 30 && p.b < 30);
     // return (p.r < 30 && p.g < 30 && p.b < 30);
 }
