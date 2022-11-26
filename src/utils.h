@@ -35,7 +35,7 @@ double degrees2radians(double degrees);
 
 Bbox getBoundingBox(Voxels& voxels);
 
-Cylinder getCylinder(Voxels& voxels, const Bbox& bbox, const double axisXPos, const double axisZPos);
+Cylinder getCylinder(Voxels& voxels, Bbox& bbox, const double axisXPos, const double axisZPos);
 
 void removeSingleVoxels(Voxels& voxels);
 

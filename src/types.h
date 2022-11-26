@@ -208,6 +208,14 @@ struct Cylinder{
 struct Bbox{
     Vec3 min;
     Vec3 max;
+
+    double getWidth(){
+        return max.x - min.x;
+    }
+
+    double getDepth(){
+        return max.y - min.y;
+    }
 };
 
 // Relative coordinates of middle point on given edge

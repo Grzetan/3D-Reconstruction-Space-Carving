@@ -381,15 +381,16 @@ Bbox getBoundingBox(Voxels& voxels){
     };
 }
 
-Cylinder getCylinder(Voxels& voxels, const Bbox& bbox, const double axisXPos, const double axisZPos){
-    double maxDist = 0;
-    
-    double axisX = (axisXPos * voxels.SCENE_SIZE * voxels.VOXEL_SIZE);
-    double axisZ = (axisZPos * voxels.SCENE_SIZE * voxels.VOXEL_SIZE);
+Cylinder getCylinder(Voxels& voxels, Bbox& bbox, const double axisXPos, const double axisZPos){    
+    double axisX = (axisXPos * voxels.SCENE_SIZE);
+    double axisZ = (axisZPos * voxels.SCENE_SIZE);
 
     std::cout << axisX << ", " << axisZ << std::endl;
 
-    // TODO: Adjust cylinder to rotation axis
+    // axisX = axisZ = 100;
+
+    // Find the longest distance between voxel and roation axis
+
     // int x,y,z;
     // for(x=0; x<voxels.SCENE_SIZE; x++){
     //     for(y=0; y<voxels.SCENE_SIZE; y++){
@@ -404,11 +405,28 @@ Cylinder getCylinder(Voxels& voxels, const Bbox& bbox, const double axisXPos, co
     //     }
     // }
 
-    double w = (bbox.max.x - bbox.min.x);
-    double d = (bbox.max.y - bbox.min.y);
-    double r = (w > d) ? w / 2 : d / 2;
 
-    return {r * voxels.VOXEL_RL_SIZE, (bbox.max.z - bbox.min.z) * voxels.VOXEL_RL_SIZE, {0 / voxels.VOXEL_SIZE * voxels.VOXEL_RL_SIZE, bbox.min.y, 0 / voxels.VOXEL_SIZE * voxels.VOXEL_RL_SIZE}};
+    // Return the distance between the farthest bbox point and rotation axis
+
+    double W = bbox.getWidth();
+    double D = bbox.getDepth();
+    const std::vector<std::array<double, 2>> points = {{bbox.min.x, bbox.min.y + D/2}, {bbox.min.x + W/2, bbox.min.y}, {bbox.min.x + W/2, bbox.max.y}, {bbox.max.x, bbox.min.y + D/2}};
+    double maxDist = 0;
+
+    for(auto& p : points){
+        double dist = sqrt(std::pow(p[0]-axisX, 2) + std::pow(p[1]-axisZ, 2));
+        if(maxDist < dist) maxDist = dist;
+    }
+
+    double r = maxDist * voxels.VOXEL_RL_SIZE;
+
+    // Very simple way to do this
+
+    // double w = (bbox.max.x - bbox.min.x);
+    // double d = (bbox.max.y - bbox.min.y);
+    // double r = (w > d) ? w / 2 : d / 2;
+
+    return {r, (bbox.max.z - bbox.min.z) * voxels.VOXEL_RL_SIZE, {0 / voxels.VOXEL_SIZE * voxels.VOXEL_RL_SIZE, bbox.min.y, 0 / voxels.VOXEL_SIZE * voxels.VOXEL_RL_SIZE}};
 }
 
 // Create voxel group
