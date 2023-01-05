@@ -43,7 +43,7 @@ void createGroupVoxels(Voxels& voxels, int x, int y, int z, std::vector<VoxelAre
 
 void createGroupImage(BMP& image, int x, int y, std::vector<ImageArea>& groups);
 
-void segmentImage(BMP& image);
+void segmentImage(BMP& image, double& intensitySum, unsigned long& pixelNum);
 
 void removeGate(Voxels& voxels, std::vector<std::array<int, 6>>& areasToRemove);
 

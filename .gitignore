@@ -17,6 +17,7 @@ photoshoot/*
 # Precompiled Headers
 *.gch
 *.pch
+*.bmp
 
 # Compiled Dynamic libraries
 *.so

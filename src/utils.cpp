@@ -544,7 +544,7 @@ void removeSingleVoxels(Voxels& voxels){
 
 // WHITE = background
 // BLACK = object
-void segmentImage(BMP& image){
+void segmentImage(BMP& image, double& intensitySum, unsigned long& pixelNum){
     int x, y;
     std::vector<ImageArea> detectedGroups = {};
 
@@ -555,6 +555,9 @@ void segmentImage(BMP& image){
             if(isPixelBackground(pixel) || x > 520 || y < 100){
                 image.set_pixel(x, y, 255, 255, 255, 255);
                 continue;
+            }else{
+                intensitySum += (pixel.r + pixel.g + pixel.b) / 3;
+                pixelNum++;
             }
             // image.set_pixel(x, y, 0,0,0, 255);
             // continue;

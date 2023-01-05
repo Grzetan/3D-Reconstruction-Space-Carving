@@ -140,6 +140,10 @@ int main(int argc, char *argv[]){
 
     double axisXPos, axisZPos;
 
+    // Variables that are passed to segment image to calcualte object brightness
+    double intensitySum = 0;
+    unsigned long pixelNum = 0;
+
     if(N_IMAGES % 4 == 0 && args.get<bool>("--adjust_rotation")){
         std::cout << "Adjusting rotation axis..." << std::endl;
         int degrees90Rotation = N_IMAGES / 4;
@@ -148,7 +152,7 @@ int main(int argc, char *argv[]){
         // For 4 images (0, 90, 180 and 270) calculate the size of image. This will be necessary to calculate rotation axis
         for(int i=0; i<4; i++){
             BMP img(images[i*degrees90Rotation]);
-            segmentImage(img);
+            segmentImage(img, intensitySum, pixelNum);
             int min = W, max = 0;
             for(int x=0; x<W; x++){
                 for(int y=VERTICAL_MARGIN; y<H; y++){
@@ -183,7 +187,7 @@ int main(int argc, char *argv[]){
 
     
     // Calculate RL voxel size from first image
-    segmentImage(sampleImg);
+    segmentImage(sampleImg, intensitySum, pixelNum);
     calibrateVoxels(sampleImg, voxels, cameraPos, gridCenter, oneTickX, startAngleX);
 
     std::cout << "Carving space..." << std::endl;
@@ -199,12 +203,15 @@ int main(int argc, char *argv[]){
         std::filesystem::create_directory("segmented_images");
     }
 
+    intensitySum = 0;
+    pixelNum = 0;
+
     for(int i=0; i<N_IMAGES; i++){
         std::cout << "Image " << i << "/" << N_IMAGES << "\t\r" << std::flush;
         // Read current image
         BMP img(images[i]);
 
-        segmentImage(img);
+        segmentImage(img, intensitySum, pixelNum);
 
         if(args.get<bool>("--save_segmented")){
             img.write("segmented_images/output" + std::to_string(i) + ".bmp");
@@ -262,6 +269,9 @@ int main(int argc, char *argv[]){
 
     Cylinder cylinder = getCylinder(voxels, bbox, axisXPos, axisZPos);
     std::cout << "Cylinder: radius = " << cylinder.r << "cm, height = " << cylinder.h << "cm, center = (" << cylinder.center.x << ", " << cylinder.center.y << ", " << cylinder.center.z << ")" << std::endl;
+
+    double objectBrightness = intensitySum / pixelNum;
+    std::cout << "Object brightness: " << objectBrightness << " / 255" << std::endl;
 
     std::cout << "Rendering carved space..." << std::endl;
 
