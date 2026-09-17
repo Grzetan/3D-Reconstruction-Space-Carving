@@ -1,4 +1,3 @@
-
 # 3D reconstruction using Space Carving
 
 Implementation of space (voxel) carving written in C++. 
@@ -132,7 +131,7 @@ Default value is `1`
 
 Threshold for segmenting an input image. If pixel is brighter than `segmentation_thresh` it will be qualified as part of an object.
 
-Default value is `60`. Range: `<1, 255>`.
+Default value is `50`. Range: `<1, 255>`.
 
 Example:
 ```bash
